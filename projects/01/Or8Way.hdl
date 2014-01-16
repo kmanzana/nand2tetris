@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 01
+// FILENAME:...... Or8Way.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/01/Or8Way.hdl
@@ -8,9 +17,15 @@
  */
 
 CHIP Or8Way {
-    IN in[8];
-    OUT out;
+  IN in[8];
+  OUT out;
 
-    PARTS:
-    // Put your code here:
+  PARTS:
+  Or(a=in[0], b=in[1], out=c);
+  Or(a=in[2], b=in[3], out=d);
+  Or(a=in[4], b=in[5], out=e);
+  Or(a=in[6], b=in[7], out=f);
+  Or(a=c, b=d, out=g);
+  Or(a=e, b=f, out=h);
+  Or(a=g, b=h, out=out);
 }

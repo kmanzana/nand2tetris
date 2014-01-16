@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 01
+// FILENAME:...... DMux8Way.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/01/DMux8Way.hdl
@@ -11,11 +20,12 @@
  *                     {0,0,0,0,0,0,0,in} if sel==111
  */
 
-
 CHIP DMux8Way {
-    IN in, sel[3];
-    OUT a, b, c, d, e, f, g, h;
+  IN in, sel[3];
+  OUT a, b, c, d, e, f, g, h;
 
-    PARTS:
-    // Put your code here:
+  PARTS:
+  DMux(in=in, sel=sel[2], a=inabcd, b=inefgh);
+  DMux4Way(in=inabcd, sel=sel[0..1], a=a, b=b, c=c, d=d);
+  DMux4Way(in=inefgh, sel=sel[0..1], a=e, b=f, c=g, d=h);
 }

@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 01
+// FILENAME:...... DMux.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/01/DMux.hdl
@@ -9,11 +18,12 @@
  *         {0,in} if sel==1
  */
 
-
 CHIP DMux {
-    IN in, sel;
-    OUT a, b;
+  IN in, sel;
+  OUT a, b;
 
-    PARTS:
-    // Put your code here:
+  PARTS:
+  Not(in=sel, out=notsel);
+  And(a=notsel, b=in, out=a);
+  And(a=sel, b=in, out=b);
 }

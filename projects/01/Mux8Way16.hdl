@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 01
+// FILENAME:...... Mux8Way16.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/01/Mux8Way16.hdl
@@ -12,11 +21,13 @@
  */
 
 CHIP Mux8Way16 {
-    IN a[16], b[16], c[16], d[16],
-       e[16], f[16], g[16], h[16],
-       sel[3];
-    OUT out[16];
+  IN a[16], b[16], c[16], d[16],
+     e[16], f[16], g[16], h[16],
+     sel[3];
+  OUT out[16];
 
-    PARTS:
-    // Put your code here:
+  PARTS:
+  Mux4Way16(a=a, b=b, c=c, d=d, sel=sel[0..1], out=ad);
+  Mux4Way16(a=e, b=f, c=g, d=h, sel=sel[0..1], out=eh);
+  Mux16(a=ad, b=eh, sel=sel[2], out=out);
 }
