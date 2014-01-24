@@ -1,22 +1,31 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 01
+// FILENAME:...... ALU.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/02/ALU.hdl
+// File name: projects/01/ALU.hdl
 
 /**
  * The ALU. Computes one of the following functions:
  * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
- * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs, 
+ * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs,
  * according to 6 input bits denoted zx,nx,zy,ny,f,no.
- * The bit-combinations that yield each function are 
- * documented in the book. In addition, the ALU 
+ * The bit-combinations that yield each function are
+ * documented in the book. In addition, the ALU
  * computes two 1-bit outputs: if the ALU output
  * is 0, zr is set to 1; otherwise zr is set to 0;
  * If out<0, ng is set to 1; otherwise ng is set to 0.
  */
 
 // Implementation: the ALU manipulates the x and y
-// inputs and then operates on the resulting values, 
+// inputs and then operates on the resulting values,
 // as follows:
 // if (zx==1) set x = 0        // 16-bit constant
 // if (nx==1) set x = ~x       // bitwise "not"
@@ -28,22 +37,45 @@
 // if (out==0) set zr = 1
 // if (out<0) set ng = 1
 
-  
+
 CHIP ALU {
-    IN  
-        x[16], y[16],  // 16-bit inputs        
-        zx, // zero the x input?
-        nx, // negate the x input?
-        zy, // zero the y input?
-        ny, // negate the y input?
-        f,  // compute  out = x + y (if 1) or out = x & y (if 0)
-        no; // negate the out output?
+  IN
+    x[16], y[16],  // 16-bit inputs
+    zx, // zero the x input?
+    nx, // negate the x input?
+    zy, // zero the y input?
+    ny, // negate the y input?
+    f,  // compute  out = x + y (if 1) or out = x & y (if 0)
+    no; // negate the out output?
 
-    OUT 
-        out[16], // 16-bit output
-        zr, // 1 if (out==0), 0 otherwise
-        ng; // 1 if (out<0),  0 otherwise
+  OUT
+    out[16], // 16-bit output
+    zr, // 1 if (out==0), 0 otherwise
+    ng; // 1 if (out<0),  0 otherwise
 
-    PARTS:
-   // Put you code here:
+  PARTS:
+  Mux16(a=x, b=false, sel=zx, out=zeroedx); // should be and/or
+
+  Not16(in=zeroedx, out=notx);
+  Mux16(a=zeroedx, b=notx, sel=nx, out=nottedx);
+
+  Mux16(a=y, b=false, sel=zy, out=zeroedy); // should be and/or
+
+  Not16(in=zeroedy, out=noty);
+  Mux16(a=zeroedy, b=noty, sel=ny, out=nottedy);
+
+  And16(a=nottedx, b=nottedy, out=anded);
+  Add16(a=nottedx, b=nottedy, out=added);
+
+  Mux16(a=anded, b=added, sel=f, out=output);
+
+  Not16(in=output, out=notoutput);
+
+  Mux16(a=output, b=notoutput, sel=no, out=finalout);
+
+  Or16Way(in=finalout, out=notzr);
+  Not(in=notzr, out=zr);
+
+  Neg16(in=finalout, out=ng);
+  Or16(a=finalout, out=out);
 }

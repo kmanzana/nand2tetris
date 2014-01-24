@@ -3,25 +3,25 @@
 // PROGRAMMER:.... Manzanares, Kelton M.
 // COURSE:........ CSCI-410
 // TERM:.......... SP14
-// PROJECT:....... 01
-// FILENAME:...... HalfAdder.hdl
+// PROJECT:....... 02
+// FILENAME:...... Or16Way.hdl
 //============================================================
 
 // This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/01/HalfAdder.hdl
+// File name: projects/01/Or16Way.hdl
 
 /**
- * Computes the sum of two bits.
+ * 16-way or gate: out = in[0] or in[1] or ... or in[16].
  */
 
-CHIP HalfAdder {
-  IN a, b;    // 1-bit inputs
-  OUT sum,    // Right bit of a + b
-      carry;  // Left bit of a + b
+CHIP Or16Way {
+  IN in[16];
+  OUT out;
 
   PARTS:
-  Xor(a=a, b=b, out=sum);
-  And(a=a, b=b, out=carry);
+  Or8Way(in=in[0..7], out=out0);
+  Or8Way(in=in[8..15], out=out1);
+  Or(a=out0, b=out1, out=out);
 }

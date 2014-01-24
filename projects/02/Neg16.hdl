@@ -4,24 +4,22 @@
 // COURSE:........ CSCI-410
 // TERM:.......... SP14
 // PROJECT:....... 01
-// FILENAME:...... HalfAdder.hdl
+// FILENAME:...... Neg16.hdl
 //============================================================
 
 // This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/01/HalfAdder.hdl
+// File name: projects/01/Neg16.hdl
 
 /**
- * Computes the sum of two bits.
+ * Neg16 gate: out = in[15]
  */
 
-CHIP HalfAdder {
-  IN a, b;    // 1-bit inputs
-  OUT sum,    // Right bit of a + b
-      carry;  // Left bit of a + b
+CHIP Neg16 {
+  IN  in[16];
+  OUT out;
 
   PARTS:
-  Xor(a=a, b=b, out=sum);
-  And(a=a, b=b, out=carry);
+  Or(a=in[15], out=out);
 }

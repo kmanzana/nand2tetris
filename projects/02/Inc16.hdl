@@ -1,16 +1,25 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 01
+// FILENAME:...... Inc16.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/02/Inc16.hdl
+// File name: projects/01/Inc16.hdl
 
 /**
  * 16-bit incrementer: out = in + 1 (arithmetic addition)
  */
 
 CHIP Inc16 {
-    IN in[16];
-    OUT out[16];
+  IN in[16];
+  OUT out[16];
 
-    PARTS:
-   // Put you code here:
+  PARTS:
+  Add16(a=in, b[0]=true, b[1..15]=false, out=out);
 }
