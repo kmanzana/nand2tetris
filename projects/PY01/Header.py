@@ -32,6 +32,10 @@ class Header:
     row = comment + ' PROGRAMMER:'
     row = row + (self.valueColumn - row.__len__()) * '.' + ' ' + self.programmer
     header.append(row)
+    
+    row = comment + ' COURSE:'
+    row = row + (self.valueColumn - row.__len__()) * '.' + ' ' + self.course
+    header.append(row)
 
     row = comment + ' TERM:'
     row = row + (self.valueColumn - row.__len__()) * '.' + ' ' + self.term
