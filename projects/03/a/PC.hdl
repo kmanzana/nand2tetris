@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 03
+// FILENAME:...... PC.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/03/a/PC.hdl
@@ -12,13 +21,14 @@
  */
 
 CHIP PC {
-    IN in[16],load,inc,reset;
-    OUT out[16];
+  IN in[16], load, inc, reset;
+  OUT out[16];
 
-    PARTS:
-    // Put your code here:
+  PARTS:
+  Inc16(in=Q, out=incremented);
+
+  Mux8Way16(a=Q, b=false, c=in, d=false, e=incremented, f=false, g=in, h=false,
+    sel[0]=reset, sel[1]=load, sel[2]=inc, out=D);
+
+  Register(in=D, load=true, out=Q, out=out);
 }
-
-
-
-

@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:........ KMANZANA
+// PROGRAMMER:.... Manzanares, Kelton M.
+// COURSE:........ CSCI-410
+// TERM:.......... SP14
+// PROJECT:....... 03
+// FILENAME:...... Bit.hdl
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/03/a/Bit.hdl
@@ -10,9 +19,10 @@
  */
 
 CHIP Bit {
-    IN in, load;
-    OUT out;
+  IN in, load;
+  OUT out;
 
-    PARTS:
-    // Put your code here:
+  PARTS:
+  Mux(a=Q, b=in, sel=load, out=D);
+  DFF(in=D, out=Q, out=out);
 }
