@@ -49,6 +49,10 @@ class Parser:
     else:
       return ''
 
+
+  def original_command(self):
+    return self.commands[self.command_number]
+
   # private
 
   def decimal_to_binary(self, line):

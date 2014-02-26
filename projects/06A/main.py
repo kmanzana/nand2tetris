@@ -18,22 +18,42 @@ class Main:
   def main():
     filename      = os.path.join(os.getcwd(), Util.getCommandLineArg(1))
     parser        = Parser(filename)
+
     hack_filename = filename.replace('asm', 'hack')
-    file          = open(hack_filename, 'w')
+    hack_file     = open(hack_filename, 'w')
+
+    ann_filename  = filename.replace('asm', 'ann')
+    ann_file      = open(ann_filename, 'w')
+
 
     while parser.has_more_commands():
       parser.advance()
+      machine_command = ''
 
       if parser.command_type() is 'A_COMMAND':
-        file.write('{0:016b}\n'.format(int(parser.symbol())))
+        machine_command = '{0:016b}\n'.format(int(parser.symbol()))
+
+        hack_file.write(machine_command)
       elif parser.command_type() is 'C_COMMAND':
         dest = Code.dest(parser.dest())
         comp = Code.comp(parser.comp())
         jump = Code.jump(parser.jump())
 
-        file.write('111{0}{1}{2}\n'.format(comp, dest, jump))
+        machine_command = '111{0}{1}{2}\n'.format(comp, dest, jump)
+
+        hack_file.write(machine_command)
 
       # elif parser.command_type() is 'L_COMMAND':
       #   parser.symbol()
 
-    file.close()
+      assembly = parser.original_command().strip()
+
+      mc = machine_command.strip()
+
+      annotated_machine = '{} {} {} {}'.format(mc[0:4], mc[4:8], mc[8:12], mc[12:16])
+      annotated_command = '{:<39} // {:<11} {}\n'.format(assembly, parser.command, annotated_machine)
+
+      ann_file.write(annotated_command)
+
+    hack_file.close()
+    ann_file.close()

@@ -33,24 +33,14 @@ class TestParser(unittest.TestCase):
     self.parser.command = 'D;JGT'
     assert self.parser.command_type() == 'C_COMMAND'
 
+    self.parser.command = 'D=X4C;JGT'
+    assert self.parser.command_type() == 'C_COMMAND'
+
   def test_symbol(self):
     self.parser.command = '@foo'
     assert self.parser.symbol() == 'foo'
 
     self.parser.command = '@2'
     assert self.parser.symbol() == '2'
-
-  # def test_translate_A_instruction(self):
-  #   line_1 = 'AD=M+D'
-  #   expected_1 = 'C'
-
-  #   line_2 = 'D;JGT'
-  #   expected_2 = '1111111110011100'
-
-  #   actual_1 = self.parser.command_type(line_1)
-  #   actual_2 = self.parser.command_type(line_2)
-
-  #   assert expected_1 == actual_1
-  #   assert expected_2 == actual_2
 
 unittest.main()
