@@ -5,7 +5,7 @@
 
 // Computes R0 = 2 + 3
 
-@2
+@2 // long comment asdl;fjkasdfasdfasdfasdfasdfasdf
 D=A
 @3
 D=D+A

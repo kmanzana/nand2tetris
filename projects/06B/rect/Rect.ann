@@ -1,0 +1,64 @@
+// This file is part of www.nand2tetris.org //                
+// and the book "The Elements of Computing Systems" //                
+// by Nisan and Schocken, MIT Press.    //                
+// File name: projects/06/rect/Rect.asm //                
+                                        //                
+// Draws a rectangle at the top-left corner of the screen. //                
+// The rectangle is 16 pixels wide and R0 pixels high. //                
+                                        //                
+@0                                      // @0          0000 0000 0000 0000
+D=M                                     // D=M         1111 1100 0001 0000
+@INFINITE_LOOP                          // @23         0000 0000 0001 0111
+D;JLE                                   // D;JLE       1110 0011 0000 0110
+@counter                                // @16         0000 0000 0001 0000
+M=D                                     // M=D         1110 0011 0000 1000
+@SCREEN                                 // @16384      0100 0000 0000 0000
+D=A                                     // D=A         1110 1100 0001 0000
+@address                                // @17         0000 0000 0001 0001
+M=D                                     // M=D         1110 0011 0000 1000
+(LOOP)                                  // 10             
+@address                                // @17         0000 0000 0001 0001
+A=M                                     // A=M         1111 1100 0010 0000
+M=-1                                    // M=-1        1110 1110 1000 1000
+@address                                // @17         0000 0000 0001 0001
+D=M                                     // D=M         1111 1100 0001 0000
+@32                                     // @32         0000 0000 0010 0000
+D=D+A                                   // D=D+A       1110 0000 1001 0000
+@address                                // @17         0000 0000 0001 0001
+M=D                                     // M=D         1110 0011 0000 1000
+@counter                                // @16         0000 0000 0001 0000
+MD=M-1                                  // MD=M-1      1111 1100 1001 1000
+@LOOP                                   // @10         0000 0000 0000 1010
+D;JGT                                   // D;JGT       1110 0011 0000 0001
+(INFINITE_LOOP)                         // 23             
+@INFINITE_LOOP                          // @23         0000 0000 0001 0111
+0;JMP                                   // 0;JMP       1110 1010 1000 0111
+
+// Symbol Table:
+// VAR: counter         -> 16
+// VAR: THAT            -> 4
+// VAR: R14             -> 14
+// VAR: R15             -> 15
+// VAR: R12             -> 12
+// VAR: R13             -> 13
+// VAR: R10             -> 10
+// VAR: R11             -> 11
+// VAR: KBD             -> 24576
+// VAR: R4              -> 4
+// VAR: R5              -> 5
+// VAR: R6              -> 6
+// VAR: R7              -> 7
+// VAR: R0              -> 0
+// VAR: R1              -> 1
+// VAR: R2              -> 2
+// VAR: R3              -> 3
+// VAR: SCREEN          -> 16384
+// VAR: R8              -> 8
+// VAR: R9              -> 9
+// VAR: address         -> 17
+// LAB: INFINITE_LOOP   -> 23
+// VAR: THIS            -> 3
+// VAR: SP              -> 0
+// VAR: ARG             -> 2
+// VAR: LCL             -> 1
+// LAB: LOOP            -> 10

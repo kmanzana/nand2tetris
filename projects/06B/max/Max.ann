@@ -1,0 +1,26 @@
+// This file is part of www.nand2tetris.org //                
+// and the book "The Elements of Computing Systems" //                
+// by Nisan and Schocken, MIT Press.    //                
+// File name: projects/06/max/Max.asm   //                
+                                        //                
+// Computes M[2] = max(M[0], M[1])  where M stands for RAM //                
+                                        //                
+@0                                      // @0          0000 0000 0000 0000
+D=M              // D = first number    // D=M         1111 1100 0001 0000
+@1                                      // @1          0000 0000 0000 0001
+D=D-M            // D = first number - second number // D=D-M       1111 0100 1101 0000
+@OUTPUT_FIRST                           // @OUTPUT_FIRST 0000 0000 0000 1010
+D;JGT            // if D>0 (first is greater) goto output_first // D;JGT       1110 0011 0000 0001
+@1                                      // @1          0000 0000 0000 0001
+D=M              // D = second number   // D=M         1111 1100 0001 0000
+@OUTPUT_D                               // @OUTPUT_D   0000 0000 0000 1100
+0;JMP            // goto output_d       // 0;JMP       1110 1010 1000 0111
+(OUTPUT_FIRST)                          // (OUTPUT_FIRST)    
+@0                                      // @0          0000 0000 0000 0000
+D=M              // D = first number    // D=M         1111 1100 0001 0000
+(OUTPUT_D)                              // (OUTPUT_D)     
+@2                                      // @2          0000 0000 0000 0010
+M=D              // M[2] = D (greatest number) // M=D         1110 0011 0000 1000
+(INFINITE_LOOP)                         // (INFINITE_LOOP)    
+@INFINITE_LOOP                          // @INFINITE_LOOP 0000 0000 0000 1110
+0;JMP            // infinite loop       // 0;JMP       1110 1010 1000 0111
