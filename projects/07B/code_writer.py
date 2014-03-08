@@ -151,13 +151,91 @@ class CodeWriter:
 
   def WritePushPop(self, command, segment, index):
     if command == 'push':
-      self.output.write('@{}\n'.format(index) +
-        'D=A\n'
-        '@SP\n'
-        'A=M\n'
-        'M=D\n'
-        '@SP\n'
-        'M=M+1\n\n')
+      if segment == 'constant':
+        self.output.write('@{}\n'.format(index) +
+          'D=A\n'
+          '@SP\n'
+          'A=M\n'
+          'M=D\n'
+          '@SP\n'
+          'M=M+1\n\n')
+      elif segment == 'local':
+        self.output.write('')
+    elif command == 'pop':
+      if segment == 'local':
+        self.output.write(
+          '@SP\n'
+          'AM=M-1\n'
+          'D=M\n'
+          '@R13\n'
+          'M=D\n'
+
+          '@LCL\n'
+          'D=M\n'
+          '@{}\n'.format(index) +
+          'D=D+A\n'
+
+
+          'A=M\n'
+          'M=D\n'
+          '@SP\n'
+          'M=M-1\n\n')
+      elif segment == 'argument':
+        self.output.write('@ARG\n'
+          'D=A\n'
+          '@{}\n'.format(index) +
+          'A=D+A\n'
+          'D=M\n'
+          '@SP\n'
+          'A=M\n'
+          'M=D\n'
+          '@SP\n'
+          'M=M-1\n\n')
+      elif segment == 'this':
+        self.output.write('@THIS\n'
+          'D=A\n'
+          '@{}\n'.format(index) +
+          'A=D+A\n'
+          'D=M\n'
+          '@SP\n'
+          'A=M\n'
+          'M=D\n'
+          '@SP\n'
+          'M=M-1\n\n')
+      elif segment == 'that':
+        self.output.write('@THAT\n'
+          'D=A\n'
+          '@{}\n'.format(index) +
+          'A=D+A\n'
+          'D=M\n'
+          '@SP\n'
+          'A=M\n'
+          'M=D\n'
+          '@SP\n'
+          'M=M-1\n\n')
+      elif segment == 'temp':
+        self.output.write('@THAT\n'
+          'D=A\n'
+          '@{}\n'.format(5 + index) +
+          'A=D+A\n'
+          'D=M\n'
+          '@SP\n'
+          'A=M\n'
+          'M=D\n'
+          '@SP\n'
+          'M=M-1\n\n')
+      elif segment == 'temp':
+        self.output.write('@THAT\n'
+          'D=A\n'
+          '@{}\n'.format(3 + index) +
+          'A=D+A\n'
+          'D=M\n'
+          '@SP\n'
+          'A=M\n'
+          'M=D\n'
+          '@SP\n'
+          'M=M-1\n\n')
+
 
   def Close(self):
     self.output.close()
