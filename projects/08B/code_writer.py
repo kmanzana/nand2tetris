@@ -3,7 +3,7 @@
 # PROGRAMMER:..... Manzanares, Kelton M.
 # COURSE:......... CSCI-410
 # TERM:........... SP14
-# PROJECT:........ ECS07B
+# PROJECT:........ ECS08B
 # FILENAME:....... code_writer.py
 # PYTHON VERSION:. 2.7.2
 #============================================================
@@ -99,7 +99,7 @@ class CodeWriter:
           'A=A-1\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
       elif command == 'lt':
         self.output.write('@SP\n'
           'A=M-1\n'
@@ -121,7 +121,7 @@ class CodeWriter:
           'A=A-1\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
       elif command == 'gt':
         self.output.write('@SP\n'
           'A=M-1\n'
@@ -143,7 +143,7 @@ class CodeWriter:
           'A=A-1\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
 
       self.count += 1
     else:
@@ -158,7 +158,7 @@ class CodeWriter:
           'A=M\n'
           'M=D\n'
           '@SP\n'
-          'M=M+1\n\n')
+          'M=M+1\n')
       elif segment == 'local':
         self.output.write('')
     elif command == 'pop':
@@ -179,7 +179,7 @@ class CodeWriter:
           'A=M\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
       elif segment == 'argument':
         self.output.write('@ARG\n'
           'D=A\n'
@@ -190,7 +190,7 @@ class CodeWriter:
           'A=M\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
       elif segment == 'this':
         self.output.write('@THIS\n'
           'D=A\n'
@@ -201,7 +201,7 @@ class CodeWriter:
           'A=M\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
       elif segment == 'that':
         self.output.write('@THAT\n'
           'D=A\n'
@@ -212,7 +212,7 @@ class CodeWriter:
           'A=M\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
       elif segment == 'temp':
         self.output.write('@THAT\n'
           'D=A\n'
@@ -223,7 +223,7 @@ class CodeWriter:
           'A=M\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
       elif segment == 'temp':
         self.output.write('@THAT\n'
           'D=A\n'
@@ -234,7 +234,7 @@ class CodeWriter:
           'A=M\n'
           'M=D\n'
           '@SP\n'
-          'M=M-1\n\n')
+          'M=M-1\n')
 
 
   def Close(self):
