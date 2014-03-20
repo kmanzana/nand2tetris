@@ -169,13 +169,10 @@ class CodeWriter:
           'D=M\n'
           '@R13\n'
           'M=D\n'
-
           '@LCL\n'
           'D=M\n'
           '@{}\n'.format(index) +
           'D=D+A\n'
-
-
           'A=M\n'
           'M=D\n'
           '@SP\n'
@@ -235,7 +232,6 @@ class CodeWriter:
           'M=D\n'
           '@SP\n'
           'M=M-1\n')
-
 
   def Close(self):
     self.output.close()

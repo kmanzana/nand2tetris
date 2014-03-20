@@ -34,6 +34,12 @@ class Parser:
         return 'C_POP'
       elif self.fields[0] in self.arithmetic_commands:
         return 'C_ARITHMETIC'
+      else self.fields[0] == 'label':
+        return 'C_LABEL'
+      else self.fields[0] == 'label':
+        return 'C_LABEL'
+      else self.fields[0] == 'if-goto':
+        return 'C_IF'
 
     return 'UNKNOWN'
 
