@@ -1,0 +1,257 @@
+function Snake.new 0
+push constant 4
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push constant 0
+pop this 1
+push this 0
+call Array.new 1
+pop this 2
+call SnakePen.initialDirection 0
+pop this 3
+push pointer 0
+call Snake.initPositions 1
+pop temp 0
+push pointer 0
+call Snake.move 1
+pop temp 0
+push pointer 0
+return
+function Snake.dispose 0
+push argument 0
+pop pointer 0
+push constant 0
+return
+function Snake.run 1
+push argument 0
+pop pointer 0
+label WHILE_EXP0
+push constant 0
+not
+not
+if-goto WHILE_END0
+label WHILE_EXP1
+push local 0
+push constant 0
+eq
+not
+if-goto WHILE_END1
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call Snake.move 1
+pop temp 0
+goto WHILE_EXP1
+label WHILE_END1
+push local 0
+call SnakePen.directionMin 0
+push constant 1
+sub
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+call SnakePen.directionMax 0
+push constant 1
+add
+lt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 0
+pop this 3
+label IF_FALSE1
+label IF_FALSE0
+label WHILE_EXP2
+push local 0
+push constant 0
+eq
+not
+not
+if-goto WHILE_END2
+call Keyboard.keyPressed 0
+pop local 0
+push pointer 0
+call Snake.move 1
+pop temp 0
+goto WHILE_EXP2
+label WHILE_END2
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Snake.move 2
+push argument 0
+pop pointer 0
+push pointer 0
+call Snake.incrementedIndex 1
+push this 2
+add
+pop pointer 1
+push that 0
+pop local 0
+push this 1
+push this 2
+add
+pop pointer 1
+push that 0
+pop local 1
+push this 1
+call Output.printInt 1
+pop temp 0
+push constant 1
+call String.new 1
+push constant 32
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+push constant 0
+push local 1
+add
+push constant 0
+push local 1
+add
+pop pointer 1
+push that 0
+push this 3
+call SnakePen.nextXPosition 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 1
+add
+push constant 1
+push local 1
+add
+pop pointer 1
+push that 0
+push this 3
+call SnakePen.nextYPosition 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push constant 0
+push local 0
+add
+pop pointer 1
+push that 0
+push constant 1
+push local 0
+add
+pop pointer 1
+push that 0
+call Screen.drawPixel 2
+pop temp 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 0
+push local 1
+add
+pop pointer 1
+push that 0
+push constant 1
+push local 1
+add
+pop pointer 1
+push that 0
+call Screen.drawPixel 2
+pop temp 0
+push this 1
+push this 2
+add
+push local 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push pointer 0
+call Snake.incrementedIndex 1
+pop this 1
+push this 1
+call Output.printInt 1
+pop temp 0
+call Output.println 0
+pop temp 0
+push constant 5
+call Sys.wait 1
+pop temp 0
+push constant 0
+return
+function Snake.initPositions 2
+push argument 0
+pop pointer 0
+label WHILE_EXP0
+push local 0
+push this 0
+lt
+not
+if-goto WHILE_END0
+push constant 2
+call Array.new 1
+pop local 1
+push constant 0
+push local 1
+add
+call SnakePen.getXMax 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 1
+add
+call SnakePen.getYMid 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push this 2
+add
+push local 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 1
+call Array.dispose 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Snake.incrementedIndex 0
+push argument 0
+pop pointer 0
+push this 1
+push constant 1
+add
+push this 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+return
+goto IF_END0
+label IF_FALSE0
+push this 1
+push constant 1
+add
+return
+label IF_END0

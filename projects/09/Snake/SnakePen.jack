@@ -1,0 +1,77 @@
+class SnakePen {
+  static int xMin, yMin, xMax, yMax;
+  static char up, right, down, left;
+
+  function void setSize(int setXMin, int setYMin, int setXMax, int setYMax) {
+    let up    = 131;
+    let right = 132;
+    let down  = 133;
+    let left  = 130;
+
+    let xMin = setXMin;
+    let yMin = setYMin;
+    let xMax = setXMax;
+    let yMax = setYMax;
+
+    return;
+  }
+
+  function int nextXPosition(int position, char direction) {
+    if (direction = right) {
+      if (position = xMax) {
+        return xMin;
+      } else {
+        return position + 1;
+      }
+    }
+    if (direction = left) {
+      if (position = xMin) {
+        return xMax;
+      } else {
+        return position - 1;
+      }
+    }
+
+    return position;
+  }
+
+
+  function int nextYPosition(int position, char direction) {
+    if (direction = down) {
+      if (position = yMax) {
+        return yMin;
+      } else {
+        return position + 1;
+      }
+    }
+    if (direction = up) {
+      if (position = yMin) {
+        return yMax;
+      } else {
+        return position - 1;
+      }
+    }
+
+    return position;
+  }
+
+  function char directionMin() {
+    return left;
+  }
+
+  function char directionMax() {
+    return down;
+  }
+
+  function char initialDirection() {
+    return right;
+  }
+
+  function int getYMid() {
+    return yMax / 2;
+  }
+
+  function int getXMax() {
+    return xMax;
+  }
+}

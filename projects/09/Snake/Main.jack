@@ -1,0 +1,12 @@
+class Main {
+  function void main() {
+    var Snake snake;
+
+    do SnakePen.setSize(0, 0, 511, 255);
+
+    let snake = Snake.new(10);
+    do snake.run();
+
+    return;
+  }
+}

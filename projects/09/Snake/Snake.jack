@@ -1,0 +1,111 @@
+class Snake {
+  field int length, index;
+  field Array positions;
+  field char direction;
+
+  constructor Snake new(int setLength) {
+    let length = setLength;
+    let index = 0;
+
+    let positions = Array.new(length);
+    let direction = SnakePen.initialDirection();
+
+    do initPositions();
+    do move();
+
+    return this;
+  }
+
+  method void dispose() {
+    return;
+  }
+
+  method void run() {
+    var char key;
+
+    while (true) {
+      while (key = 0) {
+        let key = Keyboard.keyPressed();
+        do move();
+      }
+
+      if (key > (SnakePen.directionMin() - 1)) {
+        if (key < (SnakePen.directionMax() + 1)) {
+          let direction = key;
+        }
+      }
+
+      while (~(key = 0)) {
+        let key = Keyboard.keyPressed();
+        do move();
+      }
+    }
+
+    return;
+  }
+
+  method void move() {
+    var Array tail, head;
+
+    let tail = positions[incrementedIndex()];
+    let head = positions[index];
+
+    do Output.printInt(index);
+    do Output.printString(" ");
+    // do Output.printInt(tail[0]);
+    // do Output.printString(" ");
+    // do Output.printInt(tail[1]);
+    // do Output.printString(" ");
+
+    // should return array
+    let head[0] = SnakePen.nextXPosition(head[0], direction);
+    let head[1] = SnakePen.nextYPosition(head[1], direction);
+
+    do Screen.setColor(false);
+    do Screen.drawPixel(tail[0], tail[1]);
+    do Screen.setColor(true);
+    do Screen.drawPixel(head[0], head[1]);
+
+    let positions[index] = head;
+    let index = incrementedIndex();
+
+    do Output.printInt(index);
+    // // do Output.printString(" ");
+    // do Output.printInt(tail[0]);
+    // do Output.printString(" ");
+    // do Output.printInt(tail[1]);
+    do Output.println();
+
+    do Sys.wait(5);
+
+    return;
+  }
+
+  method void initPositions() {
+    var int i;
+    var Array coordinate;
+
+
+
+    while (i < length) {
+      let coordinate = Array.new(2);
+      let coordinate[0] = SnakePen.getXMax();
+      let coordinate[1] = SnakePen.getYMid();
+
+      let positions[i] = coordinate;
+
+      do coordinate.dispose();
+      let i = i + 1;
+    }
+
+    return;
+  }
+
+  method int incrementedIndex() {
+    if ((index + 1) = length) {
+      return 0;
+    } else {
+      return index + 1;
+    }
+  }
+}
