@@ -4,7 +4,7 @@ class Main {
 
     do SnakePen.setSize(0, 0, 511, 255);
 
-    let snake = Snake.new(10);
+    let snake = Snake.new(50);
     do snake.run();
 
     return;

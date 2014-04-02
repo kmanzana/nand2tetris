@@ -5,7 +5,7 @@ push constant 511
 push constant 255
 call SnakePen.setSize 4
 pop temp 0
-push constant 10
+push constant 50
 call Snake.new 1
 pop local 0
 push local 0

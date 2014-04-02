@@ -50,31 +50,27 @@ class Snake {
     let tail = positions[incrementedIndex()];
     let head = positions[index];
 
-    do Output.printInt(index);
-    do Output.printString(" ");
-    // do Output.printInt(tail[0]);
-    // do Output.printString(" ");
-    // do Output.printInt(tail[1]);
-    // do Output.printString(" ");
+    // do printPositions();
+    // do Output.println();
 
     // should return array
-    let head[0] = SnakePen.nextXPosition(head[0], direction);
-    let head[1] = SnakePen.nextYPosition(head[1], direction);
 
     do Screen.setColor(false);
     do Screen.drawPixel(tail[0], tail[1]);
-    do Screen.setColor(true);
-    do Screen.drawPixel(head[0], head[1]);
 
-    let positions[index] = head;
+    let tail[0] = SnakePen.nextXPosition(head[0], direction);
+    let tail[1] = SnakePen.nextYPosition(head[1], direction);
+
+    do Screen.setColor(true);
+    do Screen.drawPixel(tail[0], tail[1]);
+
+    // let positions[index] = head;
     let index = incrementedIndex();
 
-    do Output.printInt(index);
-    // // do Output.printString(" ");
+    // do Output.printInt(index);
     // do Output.printInt(tail[0]);
     // do Output.printString(" ");
     // do Output.printInt(tail[1]);
-    do Output.println();
 
     do Sys.wait(5);
 
@@ -85,8 +81,6 @@ class Snake {
     var int i;
     var Array coordinate;
 
-
-
     while (i < length) {
       let coordinate = Array.new(2);
       let coordinate[0] = SnakePen.getXMax();
@@ -94,9 +88,30 @@ class Snake {
 
       let positions[i] = coordinate;
 
-      do coordinate.dispose();
+      // do coordinate.dispose();
       let i = i + 1;
     }
+
+    return;
+  }
+
+  method void printPositions() {
+    var Array tmp;
+    var int i;
+
+    let i = 0;
+
+    while (i < length) {
+      let tmp = positions[i];
+      do Output.printInt(tmp[0]);
+      do Output.printString(" ");
+      do Output.printInt(tmp[1]);
+      do Output.printString(" ");
+
+      let i = i + 1;
+    }
+
+    do Output.println();
 
     return;
   }
