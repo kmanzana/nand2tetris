@@ -1,12 +1,14 @@
-function Main.main 1
+function Main.main 2
 push constant 0
 push constant 0
 push constant 511
 push constant 255
 call SnakePen.setSize 4
-pop temp 0
+pop local 1
 push constant 50
-call Snake.new 1
+push constant 10
+push local 1
+call Snake.new 3
 pop local 0
 push local 0
 call Snake.run 1

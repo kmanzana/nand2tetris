@@ -1,8 +1,8 @@
 class SnakePen {
-  static int xMin, yMin, xMax, yMax;
   static char up, right, down, left;
+  field int xMin, yMin, xMax, yMax;
 
-  function void setSize(int setXMin, int setYMin, int setXMax, int setYMax) {
+  constructor SnakePen setSize(int setXMin, int setYMin, int setXMax, int setYMax) {
     let up    = 131;
     let right = 132;
     let down  = 133;
@@ -13,10 +13,10 @@ class SnakePen {
     let xMax = setXMax;
     let yMax = setYMax;
 
-    return;
+    return this;
   }
 
-  function int nextXPosition(int position, char direction) {
+  method int nextXPosition(int position, char direction) {
     if (direction = right) {
       if (position = xMax) {
         return xMin;
@@ -35,8 +35,7 @@ class SnakePen {
     return position;
   }
 
-
-  function int nextYPosition(int position, char direction) {
+  method int nextYPosition(int position, char direction) {
     if (direction = down) {
       if (position = yMax) {
         return yMin;
@@ -55,6 +54,14 @@ class SnakePen {
     return position;
   }
 
+  method int getYMid() {
+    return yMax / 2;
+  }
+
+  method int getXMax() {
+    return xMax;
+  }
+
   function char directionMin() {
     return left;
   }
@@ -67,11 +74,5 @@ class SnakePen {
     return right;
   }
 
-  function int getYMid() {
-    return yMax / 2;
-  }
 
-  function int getXMax() {
-    return xMax;
-  }
 }

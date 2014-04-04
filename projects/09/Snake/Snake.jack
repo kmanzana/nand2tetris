@@ -1,11 +1,21 @@
 class Snake {
-  field int length, index;
+  static SnakePen pen;
+  static boolean exit;
+  static char Q, E;
+
+  field int length, velocity, index;
   field Array positions;
   field char direction;
 
-  constructor Snake new(int setLength) {
-    let length = setLength;
-    let index = 0;
+  constructor Snake new(int setLength, int setVelocity, SnakePen setPen) {
+    let length   = setLength;
+    let velocity = (11 - setVelocity) * 2; // expecting 1 - 10
+    let pen      = setPen;
+    let index    = 0;
+
+    let exit   = false;
+    let Q      = 81;
+    let E      = 69;
 
     let positions = Array.new(length);
     let direction = SnakePen.initialDirection();
@@ -23,16 +33,17 @@ class Snake {
   method void run() {
     var char key;
 
-    while (true) {
+    while (~exit) {
       while (key = 0) {
         let key = Keyboard.keyPressed();
         do move();
       }
 
-      if (key > (SnakePen.directionMin() - 1)) {
-        if (key < (SnakePen.directionMax() + 1)) {
-          let direction = key;
-        }
+      if ((key > (SnakePen.directionMin() - 1)) & (key < (SnakePen.directionMax() + 1))) {
+        let direction = key;
+      }
+      if ((key = Q) | (key = E)) {
+        let exit = true;
       }
 
       while (~(key = 0)) {
@@ -50,29 +61,18 @@ class Snake {
     let tail = positions[incrementedIndex()];
     let head = positions[index];
 
-    // do printPositions();
-    // do Output.println();
-
-    // should return array
-
     do Screen.setColor(false);
     do Screen.drawPixel(tail[0], tail[1]);
 
-    let tail[0] = SnakePen.nextXPosition(head[0], direction);
-    let tail[1] = SnakePen.nextYPosition(head[1], direction);
+    let tail[0] = pen.nextXPosition(head[0], direction);
+    let tail[1] = pen.nextYPosition(head[1], direction);
 
     do Screen.setColor(true);
     do Screen.drawPixel(tail[0], tail[1]);
 
-    // let positions[index] = head;
     let index = incrementedIndex();
 
-    // do Output.printInt(index);
-    // do Output.printInt(tail[0]);
-    // do Output.printString(" ");
-    // do Output.printInt(tail[1]);
-
-    do Sys.wait(5);
+    do Sys.wait(velocity);
 
     return;
   }
@@ -83,12 +83,11 @@ class Snake {
 
     while (i < length) {
       let coordinate = Array.new(2);
-      let coordinate[0] = SnakePen.getXMax();
-      let coordinate[1] = SnakePen.getYMid();
+      let coordinate[0] = pen.getXMax();
+      let coordinate[1] = pen.getYMid();
 
       let positions[i] = coordinate;
 
-      // do coordinate.dispose();
       let i = i + 1;
     }
 
