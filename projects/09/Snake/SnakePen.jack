@@ -1,3 +1,14 @@
+//============================================================
+// USERID:......... KMANZANA
+// PROGRAMMER:..... Manzanares, Kelton M.
+// COURSE:......... CSCI-410
+// TERM:........... SP14
+// PROJECT:........ ECS09
+// FILENAME:....... SnakePen.jack
+//============================================================
+
+/* Class for SnakePen implementation...
+   enclosure for snake and information */
 class SnakePen {
   static char up, right, down, left;
   field int xMin, yMin, xMax, yMax;
@@ -59,11 +70,15 @@ class SnakePen {
   }
 
   method int getXMax() {
-    return xMax;
+    return Math.max(xMax, xMin);
   }
 
   function char directionMin() {
-    return left;
+    var char rl, ud;
+    let rl = Math.min(right, left);
+    let ud = Math.min(up, down);
+
+    return Math.min(rl, ud);
   }
 
   function char directionMax() {
@@ -73,6 +88,4 @@ class SnakePen {
   function char initialDirection() {
     return right;
   }
-
-
 }

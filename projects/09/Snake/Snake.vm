@@ -17,9 +17,13 @@ pop this 2
 push constant 0
 pop static 1
 push constant 81
-pop static 2
-push constant 69
 pop static 3
+push constant 69
+pop static 4
+push constant 80
+pop static 5
+push argument 3
+pop static 2
 push this 0
 call Array.new 1
 pop this 3
@@ -36,6 +40,12 @@ return
 function Snake.dispose 0
 push argument 0
 pop pointer 0
+push static 0
+call Memory.deAlloc 1
+pop temp 0
+push this 3
+call Array.dispose 1
+pop temp 0
 push constant 0
 return
 function Snake.run 1
@@ -77,19 +87,32 @@ push local 0
 pop this 4
 label IF_FALSE0
 push local 0
-push static 2
+push static 3
 eq
 push local 0
-push static 3
+push static 4
 eq
 or
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
+push pointer 0
+call Snake.dispose 1
+pop temp 0
 push constant 0
 not
 pop static 1
 label IF_FALSE1
+push local 0
+push static 5
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push pointer 0
+call Snake.printDebug 1
+pop temp 0
+label IF_FALSE2
 label WHILE_EXP2
 push local 0
 push constant 0
@@ -108,7 +131,7 @@ goto WHILE_EXP0
 label WHILE_END0
 push constant 0
 return
-function Snake.move 2
+function Snake.move 3
 push argument 0
 pop pointer 0
 push pointer 0
@@ -124,6 +147,8 @@ add
 pop pointer 1
 push that 0
 pop local 1
+push local 0
+pop local 2
 push constant 0
 call Screen.setColor 1
 pop temp 0
@@ -140,7 +165,7 @@ push that 0
 call Screen.drawPixel 2
 pop temp 0
 push constant 0
-push local 0
+push local 2
 add
 push static 0
 push constant 0
@@ -155,7 +180,7 @@ pop pointer 1
 push temp 0
 pop that 0
 push constant 1
-push local 0
+push local 2
 add
 push static 0
 push constant 1
@@ -174,12 +199,12 @@ not
 call Screen.setColor 1
 pop temp 0
 push constant 0
-push local 0
+push local 2
 add
 pop pointer 1
 push that 0
 push constant 1
-push local 0
+push local 2
 add
 pop pointer 1
 push that 0
@@ -239,18 +264,54 @@ goto WHILE_EXP0
 label WHILE_END0
 push constant 0
 return
-function Snake.printPositions 2
+function Snake.printDebug 1
 push argument 0
 pop pointer 0
+push constant 1
+call String.new 1
+pop local 0
+push local 0
+call String.newLine 0
+call String.appendChar 2
+pop local 0
+push constant 4
+call String.new 1
+push constant 83
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 58
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
 push constant 0
-pop local 1
-label WHILE_EXP0
-push local 1
+call Memory.peek 1
+call Output.printInt 1
+pop temp 0
+push local 0
+call Output.printString 1
+pop temp 0
+push pointer 0
+push constant 1
+neg
+call Snake.printPosition 2
+pop temp 0
+push constant 0
+return
+function Snake.printPosition 1
+push argument 0
+pop pointer 0
+push argument 1
 push this 0
+push constant 1
+sub
 lt
-not
-if-goto WHILE_END0
-push local 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 1
 push this 3
 add
 pop pointer 1
@@ -282,16 +343,19 @@ push constant 32
 call String.appendChar 2
 call Output.printString 1
 pop temp 0
-push local 1
+push pointer 0
+push argument 1
 push constant 1
 add
-pop local 1
-goto WHILE_EXP0
-label WHILE_END0
+call Snake.printPosition 2
+return
+goto IF_END0
+label IF_FALSE0
 call Output.println 0
 pop temp 0
-push constant 0
+push this 0
 return
+label IF_END0
 function Snake.incrementedIndex 0
 push argument 0
 pop pointer 0

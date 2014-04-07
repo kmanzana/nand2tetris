@@ -129,9 +129,21 @@ function SnakePen.getXMax 0
 push argument 0
 pop pointer 0
 push this 2
+push this 0
+call Math.max 2
 return
-function SnakePen.directionMin 0
+function SnakePen.directionMin 2
+push static 1
 push static 3
+call Math.min 2
+pop local 0
+push static 0
+push static 2
+call Math.min 2
+pop local 1
+push local 0
+push local 1
+call Math.min 2
 return
 function SnakePen.directionMax 0
 push static 2
