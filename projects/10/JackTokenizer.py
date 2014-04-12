@@ -13,19 +13,21 @@ import itertools
 
 # do this by hand first
 class JackTokenizer:
+  LEXICAL_ELEMENTS_MATCHES = ['KEYWORD', 'SYMBOL', 'INT_CONST', 'STRING_CONST', 'IDENTIFIER']
+
   KEYWORD = ('(class|constructor|function|method|field|static|var|int|char|'
     'boolean|void|true|false|null|this|let|do|if|else|while|return)')
   SYMBOL           = '([{}()[\].,;+\-*/&|<>=~])'
-  INTEGER_CONSTANT = '([0-32767])'
-  STRING_CONSTANT  = '\"([^\n]*)\"'
+  INT_CONST        = '([0-32767])'
+  STRING_CONST     = '\"([^\n]*)\"'
   IDENTIFIER       = '([A-Za-z_]\w*)'
-  LEXICAL_ELEMENTS = '{}|{}|{}|{}|{}'.format(KEYWORD, SYMBOL, INTEGER_CONSTANT,
-    STRING_CONSTANT, IDENTIFIER)
+  LEXICAL_ELEMENTS = '{}|{}|{}|{}|{}'.format(KEYWORD, SYMBOL, INT_CONST,
+    STRING_CONST, IDENTIFIER)
 
   KEYWORD_REGEX          = re.compile(KEYWORD)
   SYMBOL_REGEX           = re.compile(SYMBOL)
-  INTEGER_CONSTANT_REGEX = re.compile(INTEGER_CONSTANT)
-  STRING_CONSTANT_REGEX  = re.compile(STRING_CONSTANT)
+  INT_CONST_REGEX = re.compile(INT_CONST)
+  STRING_CONST_REGEX  = re.compile(STRING_CONST)
   IDENTIFIER_REGEX       = re.compile(IDENTIFIER)
   LEXICAL_ELEMENTS_REGEX = re.compile(LEXICAL_ELEMENTS)
 
@@ -37,44 +39,50 @@ class JackTokenizer:
     self.tokens       = self.tokenize()
     self.next_token   = ''
 
-    print self.tokens
-    # self.advance()
+    self.advance()
 
   def hasMoreTokens(self):
-    return self.next_token != ''
+    return not not self.next_token
 
   def advance(self):
     self.current_token = self.next_token
-    self.next_token = self.input.read()
-    self.fields = self.current_token.split()
+
+    if len(self.tokens) is not 0:
+      self.next_token = self.tokens.pop(0)
+    else:
+      self.next_token = False
 
   def tokenType(self):
-    pass
+    return self.current_token[1]
 
   def keyWord(self):
-    # return upcase(self.current_token)
-    pass
+    return self.current_token[0].upper()
 
   def symbol(self):
-    pass
+    return self.current_token[0]
 
   def identifier(self):
-    pass
+    return self.current_token[0]
 
   def intVal(self):
-    pass
+    return self.current_token[0]
 
   def stringVal(self):
-    pass
+    return self.current_token[0]
 
   # private
   def tokenize(self):
     input_without_comments = self.remove_comments()
 
     matches = self.LEXICAL_ELEMENTS_REGEX.findall(input_without_comments)
+
+    match_types = map(lambda element_matches: self.LEXICAL_ELEMENTS_MATCHES[next(index for index, element in enumerate(element_matches) if element)], matches)
+
     flat_matches = list(itertools.chain(*matches))
 
-    return [match for match in flat_matches if match]
+    tokens = [match for match in flat_matches if match]
+
+    return zip(tokens, match_types)
 
   def remove_comments(self):
     without_multiline = re.sub(self.MULTILINE_COMMENT_REGEX, ' ', self.input)
