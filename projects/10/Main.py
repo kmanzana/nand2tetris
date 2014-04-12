@@ -18,4 +18,5 @@ class Main:
   @staticmethod
   def main():
     # print os.path.isfile('./projects/10/ArrayTest/Main.jack')
-    tokenizer = JackTokenizer('./projects/10/ArrayTest/Main.jack')
+    # tokenizer = JackTokenizer('./projects/10/ArrayTest/Main.jack')
+    tokenizer = JackTokenizer('./projects/10/Square/Square.jack')

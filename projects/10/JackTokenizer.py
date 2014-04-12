@@ -9,30 +9,35 @@
 #============================================================
 
 import re
+import itertools
 
 # do this by hand first
 class JackTokenizer:
-  KEYWORDS = ['class', 'constructor', 'function', 'method', 'field', 'static',
-    'var', 'int', 'char', 'boolean', 'void', 'true', 'false', 'null', 'this',
-    'let', 'do', 'if', 'else', 'while', 'return']
+  KEYWORD = ('(class|constructor|function|method|field|static|var|int|char|'
+    'boolean|void|true|false|null|this|let|do|if|else|while|return)')
+  SYMBOL           = '([{}()[\].,;+\-*/&|<>=~])'
+  INTEGER_CONSTANT = '([0-32767])'
+  STRING_CONSTANT  = '\"([^\n]*)\"'
+  IDENTIFIER       = '([A-Za-z_]\w*)'
+  LEXICAL_ELEMENTS = '{}|{}|{}|{}|{}'.format(KEYWORD, SYMBOL, INTEGER_CONSTANT,
+    STRING_CONSTANT, IDENTIFIER)
 
-  SYMBOLS = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', '/',
-    '&', ', ', '<', '>', '=',  '~']
+  KEYWORD_REGEX          = re.compile(KEYWORD)
+  SYMBOL_REGEX           = re.compile(SYMBOL)
+  INTEGER_CONSTANT_REGEX = re.compile(INTEGER_CONSTANT)
+  STRING_CONSTANT_REGEX  = re.compile(STRING_CONSTANT)
+  IDENTIFIER_REGEX       = re.compile(IDENTIFIER)
+  LEXICAL_ELEMENTS_REGEX = re.compile(LEXICAL_ELEMENTS)
 
-  INTEGER_CONSTANT_MAX = 32767
-  INTEGER_CONSTANT_MIN = 0
-
-  STRING_CONSTANT_START = '"'
-
-  IDENTIFIER_REGEX = re.compile('^[A-z_]+\w*$')
+  INLINE_COMMENT_REGEX    = re.compile('//.*\n')
+  MULTILINE_COMMENT_REGEX = re.compile('/\*.*?\*/', flags=re.S)
 
   def __init__(self, input_filename):
     self.input        = open(input_filename, 'rU').read()
-    self.input_length = len(self.input)
-    self.next_token   = ''
     self.tokens       = self.tokenize()
+    self.next_token   = ''
 
-    print self.remove_comments()
+    print self.tokens
     # self.advance()
 
   def hasMoreTokens(self):
@@ -64,23 +69,15 @@ class JackTokenizer:
 
   # private
   def tokenize(self):
-    tokens = []
-    current_token = ''
+    input_without_comments = self.remove_comments()
 
-    for char in self.input:
-      if self.is_identifier(current_token) and not self.is_identifier(current_token + char):
-        tokens.push(current_token)
-      elif self.is_whitespace(current_token):
-        pass
+    matches = self.LEXICAL_ELEMENTS_REGEX.findall(input_without_comments)
+    flat_matches = list(itertools.chain(*matches))
 
-  def is_identifier(self, token):
-    pass
-
-  def is_whitespace(self, token):
-    pass
+    return [match for match in flat_matches if match]
 
   def remove_comments(self):
-    without_inline = re.sub(r'//.*\n', '', self.input)
-    without_multiline = re.sub(r'/\*\*.*\*/', '', without_inline)
+    without_multiline = re.sub(self.MULTILINE_COMMENT_REGEX, ' ', self.input)
+    without_inline = re.sub(self.INLINE_COMMENT_REGEX, '\n', without_multiline)
 
-    return without_multiline
+    return without_inline
