@@ -1,0 +1,18 @@
+//============================================================
+// USERID:......... KMANZANA
+// PROGRAMMER:..... Manzanares, Kelton M.
+// COURSE:......... CSCI-410
+// TERM:........... SP14
+// PROJECT:........ ECS09
+// FILENAME:....... Main.jack
+//============================================================
+
+class Main {
+  function void main() {
+    var int intclass;
+
+    let intclass = 1;
+    do Output.printInt(intclass);
+    return;
+  }
+}

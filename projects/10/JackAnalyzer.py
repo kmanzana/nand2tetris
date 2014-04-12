@@ -10,6 +10,6 @@
 # PYTHON VERSION:. 2.7.2
 #============================================================
 
-from main import Main
+from Main import Main
 
 Main().main()

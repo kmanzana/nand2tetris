@@ -10,10 +10,12 @@
 
 from JackTokenizer     import JackTokenizer
 from CompilationEngine import CompilationEngine
+import os
 # from Util          import Util
 # from FileSet       import FileSet
 
 class Main:
   @staticmethod
   def main():
-    pass
+    # print os.path.isfile('./projects/10/ArrayTest/Main.jack')
+    tokenizer = JackTokenizer('./projects/10/ArrayTest/Main.jack')
