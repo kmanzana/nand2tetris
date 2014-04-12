@@ -13,10 +13,11 @@ import itertools
 
 # do this by hand first
 class JackTokenizer:
-  LEXICAL_ELEMENTS_MATCHES = ['KEYWORD', 'SYMBOL', 'INT_CONST', 'STRING_CONST', 'IDENTIFIER']
+  LEXICAL_ELEMENTS_MATCHES = ['KEYWORD', 'SYMBOL', 'INT_CONST', 'STRING_CONST',
+    'IDENTIFIER']
 
-  KEYWORD = ('(class|constructor|function|method|field|static|var|int|char|'
-    'boolean|void|true|false|null|this|let|do|if|else|while|return)')
+  KEYWORD          = ('(class|constructor|function|method|field|static|var|int|'
+    'char|boolean|void|true|false|null|this|let|do|if|else|while|return)')
   SYMBOL           = '([{}()[\].,;+\-*/&|<>=~])'
   INT_CONST        = '([0-32767])'
   STRING_CONST     = '\"([^\n]*)\"'
@@ -24,22 +25,20 @@ class JackTokenizer:
   LEXICAL_ELEMENTS = '{}|{}|{}|{}|{}'.format(KEYWORD, SYMBOL, INT_CONST,
     STRING_CONST, IDENTIFIER)
 
-  KEYWORD_REGEX          = re.compile(KEYWORD)
-  SYMBOL_REGEX           = re.compile(SYMBOL)
-  INT_CONST_REGEX = re.compile(INT_CONST)
-  STRING_CONST_REGEX  = re.compile(STRING_CONST)
-  IDENTIFIER_REGEX       = re.compile(IDENTIFIER)
   LEXICAL_ELEMENTS_REGEX = re.compile(LEXICAL_ELEMENTS)
 
   INLINE_COMMENT_REGEX    = re.compile('//.*\n')
   MULTILINE_COMMENT_REGEX = re.compile('/\*.*?\*/', flags=re.S)
 
   def __init__(self, input_filename):
-    self.input        = open(input_filename, 'rU').read()
+    file = open(input_filename, 'rU')
+
+    self.input        = file.read()
     self.tokens       = self.tokenize()
     self.next_token   = ''
 
     self.advance()
+    file.close()
 
   def hasMoreTokens(self):
     return not not self.next_token
