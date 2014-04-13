@@ -19,7 +19,7 @@ class JackTokenizer:
   KEYWORD          = ('(class|constructor|function|method|field|static|var|int|'
     'char|boolean|void|true|false|null|this|let|do|if|else|while|return)')
   SYMBOL           = '([{}()[\].,;+\-*/&|<>=~])'
-  INT_CONST        = '([0-32767])'
+  INT_CONST        = '(\d+)'
   STRING_CONST     = '\"([^\n]*)\"'
   IDENTIFIER       = '([A-Za-z_]\w*)'
   LEXICAL_ELEMENTS = '{}|{}|{}|{}|{}'.format(KEYWORD, SYMBOL, INT_CONST,
