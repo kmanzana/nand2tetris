@@ -27,12 +27,13 @@ class CompilationEngine:
 
     while self.is_class_var_dec():
       self.compileClassVarDec()
+      self.save_token_if_written()
 
     while self.is_subroutine_dec():
       self.compileSubroutine()
+      self.save_token_if_written()
 
     self.write_next_token() # '}'
-
     self.write_close_tag('class')
 
   # ('static' | 'field' ) type varName (',' varName)* ';'
@@ -115,6 +116,8 @@ class CompilationEngine:
       elif 'return' in self.current_xml_token:
         self.compileReturn()
 
+      self.save_token_if_written()
+
     self.write_close_tag('statements')
 
   # 'do' subroutineCall ';'
@@ -129,7 +132,6 @@ class CompilationEngine:
     if '.' in self.current_xml_token:
       self.write_next_token()     # '.'
       self.write_next_token()     # subroutineName
-      self.save_token_if_written()
 
     self.write_next_token()       # '('
     self.compileExpressionList()  # expressionList
@@ -147,10 +149,8 @@ class CompilationEngine:
       self.write_next_token()     # '['
       self.compileExpression()    # expression
       self.write_next_token()     # ']'
-      self.save_token_if_written()
 
     self.write_next_token()       # '='
-    self.save_token_if_written()
     self.compileExpression()      # expression
     self.write_next_token()       # ';'
     self.write_close_tag('letStatement')
@@ -158,6 +158,13 @@ class CompilationEngine:
   # 'while' '(' expression ')' '{' statements '}'
   def compileWhile(self):
     self.write_open_tag('whileStatement')
+    self.write_next_token()     # 'while'
+    self.write_next_token()     # '('
+    self.compileExpression()    # expression
+    self.write_next_token()     # ')'
+    self.write_next_token()     # '{'
+    self.compileStatements()    # statements
+    self.write_next_token()     # '}'
     self.write_close_tag('whileStatement')
 
   # 'return' expression? ';'
@@ -174,6 +181,22 @@ class CompilationEngine:
   # 'if' '(' expression ')' '{' statements '}' ( 'else' '{' statements '}' )?
   def compileIf(self):
     self.write_open_tag('ifStatement')
+    self.write_next_token()     # if
+    self.write_next_token()     # '('
+    self.compileExpression()    # expression
+    self.write_next_token()     # ')'
+    self.write_next_token()     # '{'
+    self.compileStatements()    # statements
+    self.write_next_token()     # '}'
+
+    self.save_token_if_written()
+
+    if 'else' in self.current_xml_token: # else?
+      self.write_next_token()   # else
+      self.write_next_token()   # '{'
+      self.compileStatements()  # statements
+      self.write_next_token()   # '}'
+
     self.write_close_tag('ifStatement')
 
   # term (op term)*
@@ -193,6 +216,18 @@ class CompilationEngine:
   # (expression (',' expression)* )?
   def compileExpressionList(self):
     self.write_open_tag('expressionList')
+
+    self.save_token_if_written()
+
+    if ' ) ' not in self.current_xml_token:
+      self.compileExpression()        # expression
+      self.save_token_if_written() # for while
+
+    while ' ) ' not in self.current_xml_token:
+      self.write_next_token()         # ','
+      self.compileExpression()        # expression
+      self.save_token_if_written()
+
     self.write_close_tag('expressionList')
 
   # 'int' | 'char' | 'boolean' | className
@@ -247,7 +282,6 @@ class CompilationEngine:
 
     while first_identifier in self.current_xml_token or second_identifier in self.current_xml_token:
       self.write_next_token()
-
       self.save_token_if_written()
 
   def write_open_tag(self, tag):
