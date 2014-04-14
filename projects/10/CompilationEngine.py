@@ -13,15 +13,15 @@ class CompilationEngine:
   # classVarDec =  'static|field' 'int' | 'char' | 'boolean' | identifier) identifier (',' identifier)* ';'
 
   def __init__(self, output_file, token_file):
-    self.output_file    = output_file
-    self.token_file     = token_file
-    self.current_indent = 0
+    self.output_file  = output_file
+    self.token_file   = token_file
+    self.indent_count = 0
 
     self.save_token() # skip <tokens> line
 
   # 'class' className '{' classVarDec* subroutineDec* '}'
   def compileClass(self):
-    self.output_file.write('<class>\n')
+    self.write_open_tag('class')
     self.write_next_token() # 'class'
     self.write_next_token() # className
     self.write_next_token() # '{'
@@ -38,7 +38,7 @@ class CompilationEngine:
 
     self.write_current_token() # '}'
 
-    self.output_file.write('</class>\n')
+    self.write_close_tag('class')
 
   # ('static' | 'field' ) type varName (',' varName)* ';'
   def compileClassVarDec(self):
@@ -51,14 +51,14 @@ class CompilationEngine:
   # subroutineDec: ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' parameterList ')' subroutineBody
   # subroutineBody: '{' varDec* statements '}'
   def compileSubroutine(self):
-    self.output_file.write('<subroutineDec>\n')
+    self.write_open_tag('subroutineDec')
     self.write_current_token()    # ('constructor' | 'function' | 'method')
     self.write_next_token()       # ('void' | type)
     self.write_next_token()       # subroutineName
     self.write_next_token()       # '('
     self.compileParameterList()   # parameterList
     self.write_next_token()       # ')'
-    self.output_file.write('<subroutineBody>\n')
+    self.write_open_tag('subroutineBody')
     self.write_next_token()       # '{'
 
     self.save_token()
@@ -69,28 +69,28 @@ class CompilationEngine:
 
     self.compileStatements()      # statements
     self.write_current_token()    # '}'
-    self.output_file.write('</subroutineBody>\n')
-    self.output_file.write('</subroutineDec>\n')
+    self.write_close_tag('subroutineBody')
+    self.write_close_tag('subroutineDec')
 
   # ( (type varName) (',' type varName)*)?
   def compileParameterList(self):
-    self.output_file.write('<parameterList>\n')
-    self.output_file.write('</parameterList>\n')
+    self.write_open_tag('parameterList')
+    self.write_close_tag('parameterList')
 
   # 'var' type varName (',' varName)* ';'
   def compileVarDec(self):
-    self.output_file.write('<varDec>\n')
+    self.write_open_tag('varDec')
     self.write_current_token()                # 'var'
     self.write_next_token()                   # type
     self.write_next_token()                   # varName
     self.compile_multiple(',', 'identifier')  # (',' varName)*
     self.write_current_token()                # ';'
-    self.output_file.write('</varDec>\n')
+    self.write_close_tag('varDec')
 
   # statement*
   # letStatement | ifStatement | whileStatement | doStatement | returnStatement
   def compileStatements(self):
-    self.output_file.write('<statements>\n')
+    self.write_open_tag('statements')
 
     while self.is_statement():
       if 'let' in self.current_xml_token:
@@ -106,12 +106,12 @@ class CompilationEngine:
 
       self.save_token()
 
-    self.output_file.write('</statements>\n')
+    self.write_close_tag('statements')
 
   # 'do' subroutineCall ';'
   # subroutineCall: subroutineName '(' expressionList ')' | ( className | varName) '.' subroutineName '(' expressionList ')'
   def compileDo(self):
-    self.output_file.write('<doStatement>\n')
+    self.write_open_tag('doStatement')
     self.write_current_token() # 'do'
     self.write_next_token() # (subroutineName | className | varName)
 
@@ -125,11 +125,11 @@ class CompilationEngine:
     self.compileExpressionList() # expressionList
     self.write_next_token() # ')'
     self.write_next_token() # ';'
-    self.output_file.write('</doStatement>\n')
+    self.write_close_tag('doStatement')
 
   # 'let' varName ('[' expression ']')? '=' expression ';'
   def compileLet(self):
-    self.output_file.write('<letStatement>\n')
+    self.write_open_tag('letStatement')
     self.write_current_token()  # 'let'
     self.write_next_token()     # varName
 
@@ -141,47 +141,47 @@ class CompilationEngine:
     self.write_next_token()     # '='
     self.compileExpression()    # expression
     self.write_next_token()     # ';'
-    self.output_file.write('</letStatement>\n')
+    self.write_close_tag('letStatement')
 
   # 'while' '(' expression ')' '{' statements '}'
   def compileWhile(self):
-    self.output_file.write('<whileStatement>\n')
-    self.output_file.write('</whileStatement>\n')
+    self.write_open_tag('whileStatement')
+    self.write_close_tag('whileStatement')
 
   # 'return' expression? ';'
   def compileReturn(self):
-    self.output_file.write('<returnStatement>\n')
+    self.write_open_tag('returnStatement')
     self.write_current_token()  # 'return'
 
     if self.is_expression():    # expression?
       self.compileExpression()  # expression
 
     self.write_next_token()     # ';'
-    self.output_file.write('</returnStatement>\n')
+    self.write_close_tag('returnStatement')
 
   # 'if' '(' expression ')' '{' statements '}' ( 'else' '{' statements '}' )?
   def compileIf(self):
-    self.output_file.write('<ifStatement>\n')
-    self.output_file.write('</ifStatement>\n')
+    self.write_open_tag('ifStatement')
+    self.write_close_tag('ifStatement')
 
   # term (op term)*
   def compileExpression(self):
-    self.output_file.write('<expression>\n')
+    self.write_open_tag('expression')
     self.compileTerm() # term
-    self.output_file.write('</expression>\n')
+    self.write_close_tag('expression')
     pass
 
   # integerConstant | stringConstant | keywordConstant | varName |
   # varName '[' expression ']' | subroutineCall | '(' expression ')' | unaryOp term
   def compileTerm(self):
-    self.output_file.write('<term>\n')
+    self.write_open_tag('term')
     self.write_next_token() # term
-    self.output_file.write('</term>\n')
+    self.write_close_tag('term')
 
   # (expression (',' expression)* )?
   def compileExpressionList(self):
-    self.output_file.write('<expressionList>\n')
-    self.output_file.write('</expressionList>\n')
+    self.write_open_tag('expressionList')
+    self.write_close_tag('expressionList')
 
   # 'int' | 'char' | 'boolean' | className
 
@@ -209,10 +209,12 @@ class CompilationEngine:
     return False
 
   def write_next_token(self):
-    self.output_file.write(self.token_file.readline())
+    output_line = '{}{}'.format(self.current_indent(), self.token_file.readline())
+    self.output_file.write(output_line)
 
   def write_current_token(self):
-    self.output_file.write(self.current_xml_token)
+    output_line = '{}{}'.format(self.current_indent(), self.current_xml_token)
+    self.output_file.write(output_line)
 
   def save_token(self):
     self.current_xml_token = self.token_file.readline()
@@ -224,8 +226,19 @@ class CompilationEngine:
       self.write_current_token()
       self.save_token()
 
+  def write_open_tag(self, tag):
+    self.output_file.write('{}<{}>\n'.format(self.current_indent(), tag))
+    self.increase_indent()
+
+  def write_close_tag(self, tag):
+    self.decrease_indent()
+    self.output_file.write('{}</{}>\n'.format(self.current_indent(), tag))
+
   def increase_indent(self):
-    pass
+    self.indent_count += 1
 
   def decrease_indent(self):
-    pass
+    self.indent_count -= 1
+
+  def current_indent(self):
+    return '  ' * self.indent_count
