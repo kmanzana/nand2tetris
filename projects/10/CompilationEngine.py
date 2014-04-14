@@ -14,6 +14,7 @@ class CompilationEngine:
     self.output_file  = output_file
     self.token_file   = token_file
     self.indent_count = 0
+    self.written      = True
 
     self.token_file.readline() # skip <tokens> line
 
@@ -57,13 +58,11 @@ class CompilationEngine:
     self.write_open_tag('subroutineBody')
     self.write_next_token()       # '{'
 
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     while 'var' in self.current_xml_token:
       self.compileVarDec() # varDec*
-      self.save_token()
-      self.written = False
+      self.save_token_if_written()
 
     self.compileStatements()      # statements
     self.write_next_token()       # '}'
@@ -74,21 +73,18 @@ class CompilationEngine:
   def compileParameterList(self):
     self.write_open_tag('parameterList')
 
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     if ' ) ' not in self.current_xml_token:
       self.write_next_token()  # type
       self.write_next_token()  # varName
-      self.save_token()
-      self.written = False
+      self.save_token_if_written()
 
     while ' ) ' not in self.current_xml_token:
       self.write_next_token()  # ','
       self.write_next_token()  # type
       self.write_next_token()  # varName
-      self.save_token()
-      self.written = False
+      self.save_token_if_written()
 
     self.write_close_tag('parameterList')
 
@@ -125,17 +121,15 @@ class CompilationEngine:
   # subroutineCall: subroutineName '(' expressionList ')' | ( className | varName) '.' subroutineName '(' expressionList ')'
   def compileDo(self):
     self.write_open_tag('doStatement')
-    self.write_current_token()    # 'do'
+    self.write_next_token()    # 'do'
     self.write_next_token()       # (subroutineName | className | varName)
 
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     if '.' in self.current_xml_token:
       self.write_next_token()     # '.'
       self.write_next_token()     # subroutineName
-      self.save_token()
-      self.written = False
+      self.save_token_if_written()
 
     self.write_next_token()       # '('
     self.compileExpressionList()  # expressionList
@@ -153,12 +147,10 @@ class CompilationEngine:
       self.write_next_token()     # '['
       self.compileExpression()    # expression
       self.write_next_token()     # ']'
-      self.save_token()
-      self.written = False
+      self.save_token_if_written()
 
     self.write_next_token()       # '='
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
     self.compileExpression()      # expression
     self.write_next_token()       # ';'
     self.write_close_tag('letStatement')
@@ -216,27 +208,23 @@ class CompilationEngine:
 
   # private
   def is_class_var_dec(self):
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     return 'static' in self.current_xml_token or 'field' in self.current_xml_token
 
   def is_subroutine_dec(self):
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     return 'constructor' in self.current_xml_token or 'function' in self.current_xml_token or 'method' in self.current_xml_token
 
   def is_statement(self):
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     return 'let' in self.current_xml_token or 'if' in self.current_xml_token or 'while' in self.current_xml_token or 'do' in self.current_xml_token or 'return' in self.current_xml_token
 
   # TODO: implement expressions
   def is_expression(self):
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     return 'identifier' in self.current_xml_token
 
@@ -249,19 +237,18 @@ class CompilationEngine:
     output_line = '{}{}'.format(self.current_indent(), self.current_xml_token)
     self.output_file.write(output_line)
 
-  # def write_current_token(self):
-  #   output_line = '{}{}'.format(self.current_indent(), self.current_xml_token)
-  #   self.output_file.write(output_line)
-
-  def save_token(self):
-    self.current_xml_token = self.token_file.readline()
+  def save_token_if_written(self):
+    if self.written:
+      self.current_xml_token = self.token_file.readline()
+      self.written = False
 
   def compile_multiple(self, first_identifier, second_identifier):
-    self.save_token()
-    self.written = False
+    self.save_token_if_written()
 
     while first_identifier in self.current_xml_token or second_identifier in self.current_xml_token:
       self.write_next_token()
+
+      self.save_token_if_written()
 
   def write_open_tag(self, tag):
     self.output_file.write('{}<{}>\n'.format(self.current_indent(), tag))

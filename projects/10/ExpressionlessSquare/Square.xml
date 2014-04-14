@@ -41,14 +41,80 @@
           <symbol> = </symbol>
           <expression>
             <term>
-              <symbol> = </symbol>
+              <identifier> Ax </identifier>
             </term>
           </expression>
-          <identifier> Ax </identifier>
+          <symbol> ; </symbol>
         </letStatement>
+        <letStatement>
+          <keyword> let </keyword>
+          <identifier> y </identifier>
+          <symbol> = </symbol>
+          <expression>
+            <term>
+              <identifier> Ay </identifier>
+            </term>
+          </expression>
+          <symbol> ; </symbol>
+        </letStatement>
+        <letStatement>
+          <keyword> let </keyword>
+          <identifier> size </identifier>
+          <symbol> = </symbol>
+          <expression>
+            <term>
+              <identifier> Asize </identifier>
+            </term>
+          </expression>
+          <symbol> ; </symbol>
+        </letStatement>
+        <doStatement>
+          <keyword> do </keyword>
+          <identifier> draw </identifier>
+          <symbol> ( </symbol>
+          <expressionList>
+          </expressionList>
+          <symbol> ) </symbol>
+          <symbol> ; </symbol>
+        </doStatement>
+        <returnStatement>
+          <keyword> return </keyword>
+          <expression>
+            <term>
+              <identifier> x </identifier>
+            </term>
+          </expression>
+          <symbol> ; </symbol>
+        </returnStatement>
+      </statements>
+      <symbol> } </symbol>
+    </subroutineBody>
+  </subroutineDec>
+  <subroutineDec>
+    <keyword> method </keyword>
+    <keyword> void </keyword>
+    <identifier> dispose </identifier>
+    <symbol> ( </symbol>
+    <parameterList>
+    </parameterList>
+    <symbol> ) </symbol>
+    <subroutineBody>
+      <symbol> { </symbol>
+      <statements>
+        <doStatement>
+          <keyword> do </keyword>
+          <identifier> Memory </identifier>
+          <symbol> . </symbol>
+          <identifier> deAlloc </identifier>
+          <symbol> ( </symbol>
+          <expressionList>
+          </expressionList>
+          <identifier> x </identifier>
+          <symbol> ) </symbol>
+        </doStatement>
       </statements>
       <symbol> ; </symbol>
     </subroutineBody>
   </subroutineDec>
-  <keyword> let </keyword>
+  <keyword> return </keyword>
 </class>
