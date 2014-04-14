@@ -8,6 +8,8 @@
 # PYTHON VERSION:. 2.7.2
 #============================================================
 
+import re
+
 # do this by hand first
 class CompilationEngine:
   def __init__(self, output_file, token_file):
@@ -145,7 +147,9 @@ class CompilationEngine:
     self.write_next_token()       # 'let'
     self.write_next_token()       # varName
 
-    if self.is_expression():      # ('[' expression ']')?
+    self.save_token_if_written()
+
+    if ' [ ' in self.current_xml_token:      # ('[' expression ']')?
       self.write_next_token()     # '['
       self.compileExpression()    # expression
       self.write_next_token()     # ']'
@@ -172,7 +176,9 @@ class CompilationEngine:
     self.write_open_tag('returnStatement')
     self.write_next_token()     # 'return'
 
-    if self.is_expression():    # expression?
+    self.save_token_if_written()
+
+    if ' ; ' not in self.current_xml_token:    # expression?
       self.compileExpression()  # expression
 
     self.write_next_token()     # ';'
@@ -203,14 +209,47 @@ class CompilationEngine:
   def compileExpression(self):
     self.write_open_tag('expression')
     self.compileTerm() # term
+
+    while self.is_op():
+      self.write_next_token() # op
+      self.compileTerm()      # term
+
     self.write_close_tag('expression')
-    pass
 
   # integerConstant | stringConstant | keywordConstant | varName |
   # varName '[' expression ']' | subroutineCall | '(' expression ')' | unaryOp term
   def compileTerm(self):
     self.write_open_tag('term')
-    self.write_next_token() # term
+
+    self.save_token_if_written()
+
+    if self.is_unary_op_term():
+      self.write_next_token()   # unaryOp
+      self.compileTerm()        # term
+    elif ' ( ' in self.current_xml_token:
+      self.write_next_token()   # '('
+      self.compileExpression()  # expression
+      self.write_next_token()   # ')'
+    else: # first is an identifier
+      self.write_next_token() # identifier
+
+      self.save_token_if_written()
+
+      if ' [ ' in self.current_xml_token:
+        self.write_next_token() # '['
+        self.compileExpression() # expression
+        self.write_next_token() # ']'
+      elif ' . ' in self.current_xml_token:
+        self.write_next_token()       # '.'
+        self.write_next_token()       # subroutineName
+        self.write_next_token()       # '('
+        self.compileExpressionList()  # expressionList
+        self.write_next_token()       # ')'
+      elif ' ( ' in self.current_xml_token:
+        self.write_next_token()       # '('
+        self.compileExpressionList()  # expressionList
+        self.write_next_token()       # ')'
+
     self.write_close_tag('term')
 
   # (expression (',' expression)* )?
@@ -230,17 +269,6 @@ class CompilationEngine:
 
     self.write_close_tag('expressionList')
 
-  # 'int' | 'char' | 'boolean' | className
-
-  # subroutineCall: subroutineName '(' expressionList ')' | ( className | varName) '.' subroutineName
-  # '(' expressionList ')'
-
-  # op: '+'|'-'|'*'|'/'|'&'|'|'|'<'|'>'|'='
-
-  # unaryOp: '-' | '~'
-
-  # KeywordConstant: 'true' | 'false' | 'null' | 'this'
-
   # private
   def is_class_var_dec(self):
     self.save_token_if_written()
@@ -257,11 +285,17 @@ class CompilationEngine:
 
     return 'let' in self.current_xml_token or 'if' in self.current_xml_token or 'while' in self.current_xml_token or 'do' in self.current_xml_token or 'return' in self.current_xml_token
 
-  # TODO: implement expressions
-  def is_expression(self):
+  # op: '+'|'-'|'*'|'/'|'&'|'|'|'<'|'>'|'='
+  def is_op(self):
     self.save_token_if_written()
 
-    return 'identifier' in self.current_xml_token
+    return re.search(r'> (\+|-|\*|/|&amp;|\||&lt;|&gt;|=) <', self.current_xml_token)
+
+  # unaryOp: '-' | '~'
+  def is_unary_op_term(self):
+    self.save_token_if_written()
+
+    return re.search(r'> (-|~) <', self.current_xml_token)
 
   def write_next_token(self):
     if self.written:
