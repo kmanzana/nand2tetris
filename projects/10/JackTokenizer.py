@@ -30,15 +30,13 @@ class JackTokenizer:
   INLINE_COMMENT_REGEX    = re.compile('//.*\n')
   MULTILINE_COMMENT_REGEX = re.compile('/\*.*?\*/', flags=re.S)
 
-  def __init__(self, input_filename):
-    file = open(input_filename, 'rU')
-
-    self.input        = file.read()
+  def __init__(self, input_file):
+    self.input        = input_file.read()
     self.tokens       = self.tokenize()
     self.next_token   = ''
 
     self.advance()
-    file.close()
+    input_file.close()
 
   def hasMoreTokens(self):
     return not not self.next_token
