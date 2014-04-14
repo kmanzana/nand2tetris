@@ -13,7 +13,6 @@ from CompilationEngine import CompilationEngine
 from Util              import Util
 from FileSet           import FileSet
 import os
-import dicttoxml
 
 class Main:
   XML_CONVSERSIONS = {
