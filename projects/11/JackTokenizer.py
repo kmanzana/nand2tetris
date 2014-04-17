@@ -34,6 +34,7 @@ class JackTokenizer:
     self.input        = input_file.read()
     self.tokens       = self.tokenize()
     self.next_token   = ''
+    self.buffer       = ''
 
     self.advance()
     input_file.close()
@@ -70,12 +71,11 @@ class JackTokenizer:
 
   # private
   def getchar(self):
-    # self.buf = '' up
-
-    if self.buf
+    if self.buffer:
+      pass
 
   def ungetchar(self, char):
-    self.buf += char
+    self.buffer += char
 
   def tokenize(self):
     input_without_comments = self.remove_comments()

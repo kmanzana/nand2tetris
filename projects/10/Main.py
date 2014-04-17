@@ -41,7 +41,7 @@ class Main:
   @staticmethod
   def compile_jack(jack_file_name):
     token_file_name = Main.create_token_file(jack_file_name)
-    Main.create_compiled_file(jack_file_name, token_file_name)
+    Main.create_compiled_filei(jack_file_name, token_file_name)
 
   @staticmethod
   def create_token_file(jack_file_name):
