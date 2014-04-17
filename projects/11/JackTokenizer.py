@@ -11,7 +11,6 @@
 import re
 import itertools
 
-# do this by hand first
 class JackTokenizer:
   LEXICAL_ELEMENTS_MATCHES = ['KEYWORD', 'SYMBOL', 'INT_CONST', 'STRING_CONST',
     'IDENTIFIER']
@@ -30,25 +29,30 @@ class JackTokenizer:
   INLINE_COMMENT_REGEX    = re.compile('//.*\n')
   MULTILINE_COMMENT_REGEX = re.compile('/\*.*?\*/', flags=re.S)
 
-  def __init__(self, input_file):
+  def __init__(self, input_file, token_file):
     self.input        = input_file.read()
     self.tokens       = self.tokenize()
-    self.next_token   = ''
+    self.token_file   = token_file
+    self.next_token   = self.tokens.pop(0)
     self.buffer       = ''
 
-    self.advance()
+    self.token_file.write('<tokens>\n')
     input_file.close()
 
   def hasMoreTokens(self):
     return not not self.next_token
 
-  # TODO: advance should output char to token file
+  # TODO: advance should output string to token file
   def advance(self):
     self.current_token = self.next_token
 
     if len(self.tokens) is not 0:
       self.next_token = self.tokens.pop(0)
+      self.write_token()
     else:
+      self.write_token()
+      self.token_file.write('</tokens>\n')
+      self.token_file.close()
       self.next_token = False
 
   def tokenType(self):
@@ -70,12 +74,31 @@ class JackTokenizer:
     return self.current_token[0]
 
   # private
-  def getchar(self):
-    if self.buffer:
-      pass
+  # def getchar(self):
+  #   if self.buffer:
+  #     char, self.buffer = a[0], a[1:]
+  #     return char
+  #   else:
 
-  def ungetchar(self, char):
-    self.buffer += char
+  # def ungetchar(self, char):
+  #   self.buffer += char
+
+  def write_token(self):
+    if self.tokenType() is 'KEYWORD':
+      self.token_file.write('<keyword> {} </keyword>\n'.format(self.keyWord().lower()))
+    elif self.tokenType() is 'SYMBOL':
+      symbol = self.symbol()
+
+      if symbol in ['<', '>', '&']:
+        symbol = Main.XML_CONVSERSIONS[symbol]
+
+      self.token_file.write('<symbol> {} </symbol>\n'.format(symbol))
+    elif self.tokenType() is 'IDENTIFIER':
+      self.token_file.write('<identifier> {} </identifier>\n'.format(self.identifier()))
+    elif self.tokenType() is 'INT_CONST':
+      self.token_file.write('<integerConstant> {} </integerConstant>\n'.format(self.intVal()))
+    elif self.tokenType() is 'STRING_CONST':
+      self.token_file.write('<stringConstant> {} </stringConstant>\n'.format(self.stringVal()))
 
   def tokenize(self):
     input_without_comments = self.remove_comments()

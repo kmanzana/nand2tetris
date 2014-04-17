@@ -51,31 +51,10 @@ class Main:
     token_file_name = jack_file_name.replace('.jack', 'T.xml')
     token_file      = open(token_file_name, 'w')
     jack_file       = open(jack_file_name, 'rU')
-    tokenizer       = JackTokenizer(jack_file)
-
-    token_file.write('<tokens>\n')
+    tokenizer       = JackTokenizer(jack_file, token_file)
 
     while tokenizer.hasMoreTokens():
       tokenizer.advance()
-
-      if tokenizer.tokenType() is 'KEYWORD':
-        token_file.write('<keyword> {} </keyword>\n'.format(tokenizer.keyWord().lower()))
-      elif tokenizer.tokenType() is 'SYMBOL':
-        symbol = tokenizer.symbol()
-
-        if symbol in ['<', '>', '&']:
-          symbol = Main.XML_CONVSERSIONS[symbol]
-
-        token_file.write('<symbol> {} </symbol>\n'.format(symbol))
-      elif tokenizer.tokenType() is 'IDENTIFIER':
-        token_file.write('<identifier> {} </identifier>\n'.format(tokenizer.identifier()))
-      elif tokenizer.tokenType() is 'INT_CONST':
-        token_file.write('<integerConstant> {} </integerConstant>\n'.format(tokenizer.intVal()))
-      elif tokenizer.tokenType() is 'STRING_CONST':
-        token_file.write('<stringConstant> {} </stringConstant>\n'.format(tokenizer.stringVal()))
-
-    token_file.write('</tokens>\n')
-    token_file.close()
 
     return token_file_name
 
