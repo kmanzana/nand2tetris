@@ -1,0 +1,66 @@
+-use a class level and function level table
+-tables have fields: Name, Type, Kind, and Index
+-use a counter for class and function to keep track of index
+-type = ['int', 'char', 'boolean', Class]
+-kind:
+  static is life of program, put in static segment
+  field is life of object, put in heap, deallocate with object deallocation
+  arg and local are life of function, put on the stack, deallocated automatically
+-scope: class and function scops
+
+to get array reference:
+  a[3] = 19;
+
+  push argument 1 (array var a)
+  push constant 3 (array offset)
+  add
+  pop pointer 1 (that pointer)
+  push constant 19 (assigning value)
+  pop that 0 (?)
+
+  <or>
+
+  push b // evaluate expression
+  push 5
+  add
+  pop pointer 1
+
+  push a // print out LHS, must be remembered
+  push 3
+  add
+  pop pointer 1
+  pop that 0
+
+
+  a[3] = b[5];
+
+  push a // get address to memory and put in temp
+  push 3
+  add
+  pop temp 0
+
+  push b // eval of expression
+  push 5
+  add
+  pop pointer 1
+  push that 0
+
+  push temp 0 // assignment
+  pop pointer 1
+  pop that 0
+
+-expressions:
+  let x = a[b[c] + 3];
+
+  don't worry about setting a pointer since the expression has to be evaluated
+  recursively before it it possible
+
+-term op term:
+  x = a + b;
+
+  push a
+  push b
+  add
+  pop x
+
+  // order is different than token order, must save code for later
