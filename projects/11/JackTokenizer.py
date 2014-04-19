@@ -48,9 +48,9 @@ class JackTokenizer:
 
     if len(self.tokens) is not 0:
       self.next_token = self.tokens.pop(0)
-      self.write_token()
+      self.write_xml_token()
     else:
-      self.write_token()
+      self.write_xml_token()
       self.token_file.write('</tokens>\n')
       self.token_file.close()
       self.next_token = False
@@ -83,7 +83,7 @@ class JackTokenizer:
   # def ungetchar(self, char):
   #   self.buffer += char
 
-  def write_token(self):
+  def write_xml_token(self):
     if self.tokenType() is 'KEYWORD':
       self.token_file.write('<keyword> {} </keyword>\n'.format(self.keyWord().lower()))
     elif self.tokenType() is 'SYMBOL':
