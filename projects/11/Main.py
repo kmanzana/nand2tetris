@@ -42,12 +42,8 @@ class Main:
     jack_file       = open(jack_file_name, 'rU')
     tokenizer       = JackTokenizer(jack_file, token_file)
 
-    # while tokenizer.hasMoreTokens():
-    #   tokenizer.advance()
-
-    engine_file     = open(jack_file_name.replace('.jack', '') + '.xml', 'w')
+    engine_file     = open(jack_file_name.replace('.jack', '') + '.vm', 'w')
     engine          = CompilationEngine(engine_file, tokenizer)
 
     engine.compileClass()
-
     engine_file.close()
