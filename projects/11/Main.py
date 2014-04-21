@@ -17,12 +17,6 @@ from FileSet           import FileSet
 import os
 
 class Main:
-  XML_CONVSERSIONS = {
-    '<': '&lt;',
-    '>': '&gt;',
-    '&': '&amp;'
-  }
-
   @staticmethod
   def main():
     path = Util.getCommandLineArgument(1)

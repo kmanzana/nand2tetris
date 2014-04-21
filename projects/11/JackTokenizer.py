@@ -12,6 +12,12 @@ import re
 import itertools
 
 class JackTokenizer:
+  XML_CONVSERSIONS = {
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;'
+  }
+
   LEXICAL_ELEMENTS_MATCHES = ['KEYWORD', 'SYMBOL', 'INT_CONST', 'STRING_CONST',
     'IDENTIFIER']
 
@@ -90,7 +96,7 @@ class JackTokenizer:
       symbol = self.symbol()
 
       if symbol in ['<', '>', '&']:
-        symbol = Main.XML_CONVSERSIONS[symbol]
+        symbol = self.XML_CONVSERSIONS[symbol]
 
       self.token_file.write('<symbol> {} </symbol>\n'.format(symbol))
     elif self.tokenType() is 'IDENTIFIER':

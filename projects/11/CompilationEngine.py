@@ -14,6 +14,12 @@ import re
 # pass tokenizer in as arg
 # do this by hand first
 class CompilationEngine:
+  XML_CONVSERSIONS = {
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;'
+  }
+
   def __init__(self, output_file, tokenizer):
     self.output_file  = output_file
     self.tokenizer    = tokenizer
@@ -293,7 +299,7 @@ class CompilationEngine:
         symbol = self.tokenizer.symbol()
 
         if symbol in ['<', '>', '&']:
-          symbol = Main.XML_CONVSERSIONS[symbol]
+          symbol = self.XML_CONVSERSIONS[symbol]
 
         return '<symbol> {} </symbol>\n'.format(symbol)
       elif self.tokenizer.tokenType() is 'IDENTIFIER':
