@@ -11,7 +11,6 @@
 from JackTokenizer     import JackTokenizer
 from CompilationEngine import CompilationEngine
 from VMWriter          import VMWriter
-from SymbolTable       import SymbolTable
 from Util              import Util
 from FileSet           import FileSet
 import os
@@ -42,8 +41,9 @@ class Main:
     jack_file       = open(jack_file_name, 'rU')
     tokenizer       = JackTokenizer(jack_file, token_file)
 
-    engine_file     = open(jack_file_name.replace('.jack', '') + '.vm', 'w')
-    engine          = CompilationEngine(engine_file, tokenizer)
+    vm_file         = open(jack_file_name.replace('.jack', '') + '.vm', 'w')
+    vm_writer       = VMWriter(vm_file)
+
+    engine          = CompilationEngine(vm_writer, tokenizer)
 
     engine.compileClass()
-    engine_file.close()

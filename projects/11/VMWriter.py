@@ -10,47 +10,49 @@
 
 class VMWriter:
   def __init__(self, output_file):
-    pass
+    self.output = output_file
 
   # Writes a VM push command
   def writePush(self, segment, index):
-    pass
+    self.output.write('push {} {}\n'.format(segment, index))
 
   # Writes a VM pop command
   def writePop(self, segment, index):
-    pass
+    self.output.write('pop {} {}\n'.format(segment, index))
 
   # Writes a VM arithmetic command
   # command (ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT)
-  def WriteArithmetic(self, command):
+  def writeArithmetic(self, command):
+    self.output.write(command.lower() + '\n')
+
+  # Writes a VM label command
+  def writeLabel(self, label):
     pass
 
   # Writes a VM label command
-  def WriteLabel(self, label):
-    pass
-
-  # Writes a VM label command
-  def WriteGoto(self, label):
+  def writeGoto(self, label):
     pass
 
   # Writes a VM If-goto command
-  def WriteIf(self, label):
+  def writeIf(self, label):
     pass
 
   # Writes a VM call command
   def writeCall(self, name, nArgs):
-    pass
+    self.output.write('call {} {}\n'.format(name, nArgs))
 
   # Writes a VM function command
   def writeFunction(self, name, nLocals):
-    pass
+    self.output.write('function {} {}\n'.format(name, nLocals))
 
   # Writes a VM return command
   def writeReturn(self):
-    pass
+    self.output.write('return\n')
 
   # Closes the output file
   def close(self):
-    pass
+    self.output.close()
 
   # private
+  def write(self, stuff):
+    self.output.write(stuff)

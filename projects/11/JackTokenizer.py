@@ -80,15 +80,6 @@ class JackTokenizer:
     return self.current_token[0]
 
   # private
-  # def getchar(self):
-  #   if self.buffer:
-  #     char, self.buffer = a[0], a[1:]
-  #     return char
-  #   else:
-
-  # def ungetchar(self, char):
-  #   self.buffer += char
-
   def write_xml_token(self):
     if self.tokenType() is 'KEYWORD':
       self.token_file.write('<keyword> {} </keyword>\n'.format(self.keyWord().lower()))

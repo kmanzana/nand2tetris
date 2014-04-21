@@ -8,39 +8,55 @@
 # PYTHON VERSION:. 2.7.2
 #============================================================
 
-# can have current_token method which checks to see if
+# TODO: peek method
 import re
+from SymbolTable import SymbolTable
 
-# pass tokenizer in as arg
-# do this by hand first
 class CompilationEngine:
+  ARITHMETIC = {
+    '+': 'ADD',
+    '-': 'SUB',
+    # '': 'NEG',
+    '=': 'EQ',
+    '>': 'GT',
+    '<': 'LT',
+    '&': 'AND',
+    '|': 'OR',
+    '~': 'NOT'
+  }
+
   XML_CONVSERSIONS = {
     '<': '&lt;',
     '>': '&gt;',
     '&': '&amp;'
   }
 
-  def __init__(self, output_file, tokenizer):
-    self.output_file  = output_file
+  def __init__(self, vm_writer, tokenizer):
+    self.vm_writer    = vm_writer
     self.tokenizer    = tokenizer
+    self.symbol_table = SymbolTable()
     self.indent_count = 0
-    self.written      = True
+    self.used         = True
+    self.buffer       = []
 
   # 'class' className '{' classVarDec* subroutineDec* '}'
   def compileClass(self):
-    self.write_open_tag('class')
-    self.write_next_token() # 'class'
-    self.write_next_token() # className
-    self.write_next_token() # '{'
+    self.get_token() # 'class'
+    self.class_name = self.get_token() # className
+    self.get_token() # '{'
 
     while self.is_class_var_dec():
       self.compileClassVarDec()
 
-    while self.is_subroutine_dec():
-      self.compileSubroutine()
+    subroutine_kind = self.get_token()
+    self.unget_token(subroutine_kind)
 
-    self.write_next_token() # '}'
-    self.write_close_tag('class')
+    while subroutine_kind in ['constructor', 'function', 'method']:
+      self.compileSubroutine()
+      subroutine_kind = self.get_token()
+      self.unget_token(subroutine_kind)
+
+    self.vm_writer.close()
 
   # ('static' | 'field' ) type varName (',' varName)* ';'
   def compileClassVarDec(self):
@@ -55,84 +71,112 @@ class CompilationEngine:
   # subroutineDec: ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' parameterList ')' subroutineBody
   # subroutineBody: '{' varDec* statements '}'
   def compileSubroutine(self):
-    self.write_open_tag('subroutineDec')
-    self.write_next_token()    # ('constructor' | 'function' | 'method')
-    self.write_next_token()       # ('void' | type)
-    self.write_next_token()       # subroutineName
-    self.write_next_token()       # '('
+    subroutine_kind = self.get_token() # ('constructor' | 'function' | 'method')
+    return_value = self.get_token() # ('void' | type)
+    subroutine_name = self.get_token() # subroutineName
+    self.symbol_table.startSubroutine()
+
+    self.get_token() # '('
     self.compileParameterList()   # parameterList
-    self.write_next_token()    # ')'
-    self.write_open_tag('subroutineBody')
-    self.write_next_token()       # '{'
+    self.get_token() # ')'
+    self.get_token() # '{'
 
-    while 'var' in self.current_token():
+    self.local_vars = []
+    token = self.get_token()
+    self.unget_token(token)
+
+    while 'var' is token:
       self.compileVarDec() # varDec*
+      token = self.get_token()
+      self.unget_token(token)
 
-    self.compileStatements()      # statements
-    self.write_next_token()       # '}'
-    self.write_close_tag('subroutineBody')
-    self.write_close_tag('subroutineDec')
+    full_function_name = '{}.{}'.format(self.class_name, subroutine_name)
+
+    self.vm_writer.writeFunction(full_function_name, len(self.local_vars))
+
+    for local_var in self.local_vars:
+      self.vm_writer.writeLabel() # varDec
+
+    self.compileStatements() # statements
+    self.get_token() # '}'
 
   # ( (type varName) (',' type varName)*)?
   def compileParameterList(self):
-    self.write_open_tag('parameterList')
+    pass
 
-    if ' ) ' not in self.current_token():
-      self.write_next_token()  # type
-      self.write_next_token()  # varName
 
-    while ' ) ' not in self.current_token():
-      self.write_next_token()  # ','
-      self.write_next_token()  # type
-      self.write_next_token()  # varName
 
-    self.write_close_tag('parameterList')
+    # self.write_open_tag('parameterList')
+
+    # if ' ) ' not in self.current_token():
+    #   self.write_next_token()  # type
+    #   self.write_next_token()  # varName
+
+    # while ' ) ' not in self.current_token():
+    #   self.write_next_token()  # ','
+    #   self.write_next_token()  # type
+    #   self.write_next_token()  # varName
+
+    # self.write_close_tag('parameterList')
 
   # 'var' type varName (',' varName)* ';'
   def compileVarDec(self):
-    self.write_open_tag('varDec')
-    self.write_next_token()                # 'var'
-    self.write_next_token()                   # type
-    self.write_next_token()                   # varName
-    self.compile_multiple(',', 'identifier')  # (',' varName)*
-    self.write_next_token()                # ';'
-    self.write_close_tag('varDec')
+    pass
+    # self.write_open_tag('varDec')
+    # self.write_next_token()                # 'var'
+    # self.write_next_token()                   # type
+    # self.write_next_token()                   # varName
+    # self.compile_multiple(',', 'identifier')  # (',' varName)*
+    # self.write_next_token()                # ';'
+    # self.write_close_tag('varDec')
 
   # statement*
   # letStatement | ifStatement | whileStatement | doStatement | returnStatement
   def compileStatements(self):
-    self.write_open_tag('statements')
-
     while self.is_statement():
-      if 'let' in self.current_token():
-        self.compileLet()
-      elif ' if ' in self.current_token():
-        self.compileIf()
-      elif 'while' in self.current_token():
-        self.compileWhile()
-      elif 'do' in self.current_token():
-        self.compileDo()
-      elif 'return' in self.current_token():
-        self.compileReturn()
+      token = self.get_token()
 
-    self.write_close_tag('statements')
+      if 'let' == token:
+        self.compileLet()
+      elif ' if ' == token:
+        self.compileIf()
+      elif 'while' == token:
+        self.compileWhile()
+      elif 'do' == token:
+        self.compileDo()
+      elif 'return' == token:
+        self.compileReturn()
 
   # 'do' subroutineCall ';'
   # subroutineCall: subroutineName '(' expressionList ')' | ( className | varName) '.' subroutineName '(' expressionList ')'
   def compileDo(self):
-    self.write_open_tag('doStatement')
-    self.write_next_token()    # 'do'
-    self.write_next_token()       # (subroutineName | className | varName)
+    function_name = self.get_token() # (subroutineName | className | varName)
 
-    if '.' in self.current_token():
-      self.write_next_token()     # '.'
-      self.write_next_token()     # subroutineName
+    token = self.get_token()
 
-    self.write_next_token()       # '('
-    self.compileExpressionList()  # expressionList
-    self.write_next_token()       # ')'
-    self.write_next_token()       # ';'
-    self.write_close_tag('doStatement')
+    if '.' == token:
+      function_name += '.' + self.get_token() # '.' subroutineName
+
+    self.get_token() # '('
+    number_args = self.compileExpressionList()
+    self.get_token() # ')'
+    self.get_token() # ';'
+
+    self.vm_writer.writeCall(function_name, number_args)
+    self.vm_writer.writePop('temp', 0)
+    # self.write_open_tag('doStatement')
+    # self.write_next_token()    # 'do'
+    # self.write_next_token()       # (subroutineName | className | varName)
+
+    # if '.' in self.current_token():
+    #   self.write_next_token()     # '.'
+    #   self.write_next_token()     # subroutineName
+
+    # self.write_next_token()       # '('
+    # self.compileExpressionList()  # expressionList
+    # self.write_next_token()       # ')'
+    # self.write_next_token()       # ';'
+    # self.write_close_tag('doStatement')
 
   # 'let' varName ('[' expression ']')? '=' expression ';'
   def compileLet(self):
@@ -164,14 +208,21 @@ class CompilationEngine:
 
   # 'return' expression? ';'
   def compileReturn(self):
-    self.write_open_tag('returnStatement')
-    self.write_next_token()     # 'return'
+    # if expression:
+    # self.compileExpression()
+    # else:
+    self.vm_writer.writePush('constant', 0)
 
-    if ' ; ' not in self.current_token():    # expression?
-      self.compileExpression()  # expression
+    self.vm_writer.writeReturn()
 
-    self.write_next_token()     # ';'
-    self.write_close_tag('returnStatement')
+    # self.write_open_tag('returnStatement')
+    # self.write_next_token()     # 'return'
+
+    # if ' ; ' not in self.current_token():    # expression?
+    #   self.compileExpression()  # expression
+
+    # self.write_next_token()     # ';'
+    # self.write_close_tag('returnStatement')
 
   # 'if' '(' expression ')' '{' statements '}' ( 'else' '{' statements '}' )?
   def compileIf(self):
@@ -194,120 +245,197 @@ class CompilationEngine:
 
   # term (op term)*
   def compileExpression(self):
-    self.write_open_tag('expression')
     self.compileTerm() # term
 
     while self.is_op():
-      self.write_next_token() # op
-      self.compileTerm()      # term
+      op = self.get_token()
+      self.compileTerm()
 
-    self.write_close_tag('expression')
+      if op in self.ARITHMETIC.keys():
+        self.vm_writer.writeArithmetic(self.ARITHMETIC[op])
+      elif op == '*':
+        self.vm_writer.writeCall('Math.multiply', 2)
+      elif op == '/':
+        self.vm_writer.writeCall('Math.divide', 2)
+
+    # self.write_open_tag('expression')
+    # self.compileTerm() # term
+
+    # while self.is_op():
+    #   self.write_next_token() # op
+    #   self.compileTerm()      # term
+
+    # self.write_close_tag('expression')
 
   # integerConstant | stringConstant | keywordConstant | varName |
   # varName '[' expression ']' | subroutineCall | '(' expression ')' | unaryOp term
   def compileTerm(self):
-    self.write_open_tag('term')
-
+    token = self.get_token();
+    self.unget_token(token);
 
     if self.is_unary_op_term():
       self.write_next_token()   # unaryOp
       self.compileTerm()        # term
-    elif ' ( ' in self.current_token():
-      self.write_next_token()   # '('
+    elif '(' == token:
+      self.get_token()   # '('
       self.compileExpression()  # expression
-      self.write_next_token()   # ')'
+      self.get_token()   # ')'
     else: # first is an identifier
-      self.write_next_token() # identifier
+      self.get_token() # identifier
+      self.vm_writer.writePush('constant', token) # identifier
 
-      if ' [ ' in self.current_token():
-        self.write_next_token() # '['
-        self.compileExpression() # expression
-        self.write_next_token() # ']'
-      elif ' . ' in self.current_token():
-        self.write_next_token()       # '.'
-        self.write_next_token()       # subroutineName
-        self.write_next_token()       # '('
-        self.compileExpressionList()  # expressionList
-        self.write_next_token()       # ')'
-      elif ' ( ' in self.current_token():
-        self.write_next_token()       # '('
-        self.compileExpressionList()  # expressionList
-        self.write_next_token()       # ')'
+      # if '[' == token:
+      #   self.write_next_token() # '['
+      #   self.compileExpression() # expression
+      #   self.write_next_token() # ']'
+      # elif '.' == token:
+      #   self.write_next_token()       # '.'
+      #   self.write_next_token()       # subroutineName
+      #   self.write_next_token()       # '('
+      #   self.compileExpressionList()  # expressionList
+      #   self.write_next_token()       # ')'
+      # elif '(' == token:
+      #   self.write_next_token()       # '('
+      #   self.compileExpressionList()  # expressionList
+      #   self.write_next_token()       # ')'
 
-    self.write_close_tag('term')
+
+
+
+    # self.write_open_tag('term')
+
+    # if self.is_unary_op_term():
+    #   self.write_next_token()   # unaryOp
+    #   self.compileTerm()        # term
+    # elif ' ( ' in self.current_token():
+    #   self.write_next_token()   # '('
+    #   self.compileExpression()  # expression
+    #   self.write_next_token()   # ')'
+    # else: # first is an identifier
+    #   self.write_next_token() # identifier
+
+    #   if ' [ ' in self.current_token():
+    #     self.write_next_token() # '['
+    #     self.compileExpression() # expression
+    #     self.write_next_token() # ']'
+    #   elif ' . ' in self.current_token():
+    #     self.write_next_token()       # '.'
+    #     self.write_next_token()       # subroutineName
+    #     self.write_next_token()       # '('
+    #     self.compileExpressionList()  # expressionList
+    #     self.write_next_token()       # ')'
+    #   elif ' ( ' in self.current_token():
+    #     self.write_next_token()       # '('
+    #     self.compileExpressionList()  # expressionList
+    #     self.write_next_token()       # ')'
+
+    # self.write_close_tag('term')
 
   # (expression (',' expression)* )?
   def compileExpressionList(self):
-    self.write_open_tag('expressionList')
+    number_args = 0
+    token = self.get_token()
+    self.unget_token(token)
 
-    if ' ) ' not in self.current_token():
-      self.compileExpression()        # expression
+    if ')' != token:
+      number_args += 1
+      self.compileExpression()
 
-    while ' ) ' not in self.current_token():
-      self.write_next_token()         # ','
-      self.compileExpression()        # expression
+    token = self.get_token()
+    self.unget_token(token)
 
-    self.write_close_tag('expressionList')
+    while ')' != token:
+      self.vm_writer.write(token)
+      number_args += 1
+      self.get_token() # ','
+      self.compileExpression()
+      token = self.get_token()
+      self.unget_token(token)
+
+    return number_args
+
+
+    # self.write_open_tag('expressionList')
+
+    # if ' ) ' not in self.current_token():
+    #   self.compileExpression()        # expression
+
+    # while ' ) ' not in self.current_token():
+    #   self.write_next_token()         # ','
+    #   self.compileExpression()        # expression
+
+    # self.write_close_tag('expressionList')
 
   # private
   def is_class_var_dec(self):
-    return 'static' in self.current_token() or 'field' in self.current_token()
+    return False
+    # return 'static' in self.current_token() or 'field' in self.current_token()
 
   def is_subroutine_dec(self):
-    return ('constructor' in self.current_token() or
-            'function' in self.current_token() or
-            'method' in self.current_token())
+    return ('constructor' is self.current_token() or
+            'function' is self.current_token() or
+            'method' is self.current_token())
 
   def is_statement(self):
-    return ('let' in self.current_token() or
-           'if' in self.current_token() or
-           'while' in self.current_token() or
-           'do' in self.current_token() or
-           'return' in self.current_token())
+    token = self.get_token()
+    self.unget_token(token)
+    return token in ['let', 'if', 'while', 'do', 'return']
 
   # op: '+'|'-'|'*'|'/'|'&'|'|'|'<'|'>'|'='
   def is_op(self):
-    return re.search(r'> (\+|-|\*|/|&amp;|\||&lt;|&gt;|=) <', self.current_token())
+    token = self.get_token()
+    self.unget_token(token)
+    return token in ['+', '-', '*', '/', '&', '|', '<', '>', '=']
 
   # unaryOp: '-' | '~'
   def is_unary_op_term(self):
-    return re.search(r'> (-|~) <', self.current_token())
+    token = self.get_token()
+    self.unget_token(token)
+    return token in ['~', '-']
 
-  def current_token(self):
-    if self.written:
-      self.saved_token = self.get_next_token()
-      self.written = False
+  # def peek(self, number_ahead):
+  #   implement me
+  #   pass
 
-    return self.saved_token
-
-  def write_next_token(self):
-    if self.written:
-      self.saved_token = self.get_next_token()
+  def get_token(self):
+    if self.buffer:
+      return self.buffer.pop(0)
     else:
-      self.written = True
+      return self.get_next_token()
 
-    output_line = '{}{}'.format(self.current_indent(), self.saved_token)
-    self.output_file.write(output_line)
+  def unget_token(self, token):
+    self.buffer.append(token)
+
+  # def current_token(self):
+  #   if self.used:
+  #     self.saved_token = self.get_next_token()
+  #     self.used = False
+
+  #   return self.saved_token
+
+  # def write_next_token(self):
+  #   if self.used:
+  #     self.saved_token = self.get_next_token()
+  #   else:
+  #     self.used = True
+
+  #   output_line = '{}{}'.format(self.current_indent(), self.saved_token)
+  #   self.output_file.write(output_line)
 
   def get_next_token(self):
     if self.tokenizer.hasMoreTokens():
       self.tokenizer.advance()
 
       if self.tokenizer.tokenType() is 'KEYWORD':
-        return '<keyword> {} </keyword>\n'.format(self.tokenizer.keyWord().lower())
+        return self.tokenizer.keyWord().lower()
       elif self.tokenizer.tokenType() is 'SYMBOL':
-        symbol = self.tokenizer.symbol()
-
-        if symbol in ['<', '>', '&']:
-          symbol = self.XML_CONVSERSIONS[symbol]
-
-        return '<symbol> {} </symbol>\n'.format(symbol)
+        return self.tokenizer.symbol()
       elif self.tokenizer.tokenType() is 'IDENTIFIER':
-        return '<identifier> {} </identifier>\n'.format(self.tokenizer.identifier())
+        return self.tokenizer.identifier()
       elif self.tokenizer.tokenType() is 'INT_CONST':
-        return '<integerConstant> {} </integerConstant>\n'.format(self.tokenizer.intVal())
+        return self.tokenizer.intVal()
       elif self.tokenizer.tokenType() is 'STRING_CONST':
-        return '<stringConstant> {} </stringConstant>\n'.format(self.tokenizer.stringVal())
+        return self.tokenizer.stringVal()
 
   def compile_multiple(self, first_identifier, second_identifier):
     while first_identifier in self.current_token() or second_identifier in self.current_token():
