@@ -1,0 +1,17 @@
+get everything working before taking out performance problems
+
+-mult
+  if (a < 0)
+    return -Mult(-a, b)
+  if (b < 0)
+    return -Mult(a, -b)
+
+  return Mult(a, b)
+
+  # for more efficiency, use Math.absolute()
+
+-div (given in the book)
+  try to get rid of multiplication later, but use mult first
+
+-sqrt
+

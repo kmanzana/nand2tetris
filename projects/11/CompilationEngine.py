@@ -8,7 +8,8 @@
 # PYTHON VERSION:. 2.7.2
 #============================================================
 
-# TODO: peek method
+# TODO: implement vm code for different things by hand first
+# TODO: peek method look further ahead
 import re
 from SymbolTable import SymbolTable
 
@@ -25,17 +26,10 @@ class CompilationEngine:
     '~': 'NOT'
   }
 
-  XML_CONVSERSIONS = {
-    '<': '&lt;',
-    '>': '&gt;',
-    '&': '&amp;'
-  }
-
   def __init__(self, vm_writer, tokenizer):
     self.vm_writer    = vm_writer
     self.tokenizer    = tokenizer
     self.symbol_table = SymbolTable()
-    self.indent_count = 0
     self.used         = True
     self.buffer       = []
 
@@ -48,13 +42,8 @@ class CompilationEngine:
     while self.is_class_var_dec():
       self.compileClassVarDec()
 
-    subroutine_kind = self.get_token()
-    self.unget_token(subroutine_kind)
-
-    while subroutine_kind in ['constructor', 'function', 'method']:
+    while self.is_subroutine_dec():
       self.compileSubroutine()
-      subroutine_kind = self.get_token()
-      self.unget_token(subroutine_kind)
 
     self.vm_writer.close()
 
@@ -82,13 +71,11 @@ class CompilationEngine:
     self.get_token() # '{'
 
     self.local_vars = []
-    token = self.get_token()
-    self.unget_token(token)
+    token = self.peek()
 
     while 'var' is token:
       self.compileVarDec() # varDec*
-      token = self.get_token()
-      self.unget_token(token)
+      token = self.peek()
 
     full_function_name = '{}.{}'.format(self.class_name, subroutine_name)
 
@@ -270,19 +257,16 @@ class CompilationEngine:
   # integerConstant | stringConstant | keywordConstant | varName |
   # varName '[' expression ']' | subroutineCall | '(' expression ')' | unaryOp term
   def compileTerm(self):
-    token = self.get_token();
-    self.unget_token(token);
-
     if self.is_unary_op_term():
       self.write_next_token()   # unaryOp
       self.compileTerm()        # term
-    elif '(' == token:
+    elif '(' == self.peek():
       self.get_token()   # '('
       self.compileExpression()  # expression
       self.get_token()   # ')'
     else: # first is an identifier
-      self.get_token() # identifier
-      self.vm_writer.writePush('constant', token) # identifier
+      identifier = self.get_token() # identifier
+      self.vm_writer.writePush('constant', identifier) # identifier
 
       # if '[' == token:
       #   self.write_next_token() # '['
@@ -334,15 +318,13 @@ class CompilationEngine:
   # (expression (',' expression)* )?
   def compileExpressionList(self):
     number_args = 0
-    token = self.get_token()
-    self.unget_token(token)
+    token = self.peek()
 
     if ')' != token:
       number_args += 1
       self.compileExpression()
 
-    token = self.get_token()
-    self.unget_token(token)
+    token = self.peek()
 
     while ')' != token:
       self.vm_writer.write(token)
@@ -372,30 +354,24 @@ class CompilationEngine:
     # return 'static' in self.current_token() or 'field' in self.current_token()
 
   def is_subroutine_dec(self):
-    return ('constructor' is self.current_token() or
-            'function' is self.current_token() or
-            'method' is self.current_token())
+    return self.peek() in ['constructor', 'function', 'method']
 
   def is_statement(self):
-    token = self.get_token()
-    self.unget_token(token)
-    return token in ['let', 'if', 'while', 'do', 'return']
+    return self.peek() in ['let', 'if', 'while', 'do', 'return']
 
   # op: '+'|'-'|'*'|'/'|'&'|'|'|'<'|'>'|'='
   def is_op(self):
-    token = self.get_token()
-    self.unget_token(token)
-    return token in ['+', '-', '*', '/', '&', '|', '<', '>', '=']
+    return self.peek() in ['+', '-', '*', '/', '&', '|', '<', '>', '=']
 
   # unaryOp: '-' | '~'
   def is_unary_op_term(self):
+    return self.peek() in ['~', '-']
+
+  # TODO: peek method look further ahead
+  def peek(self):
     token = self.get_token()
     self.unget_token(token)
-    return token in ['~', '-']
-
-  # def peek(self, number_ahead):
-  #   implement me
-  #   pass
+    return token
 
   def get_token(self):
     if self.buffer:
