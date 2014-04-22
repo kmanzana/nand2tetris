@@ -36,6 +36,9 @@ class CompilationEngine:
     '~': 'NOT'
   }
 
+  if_index    = -1
+  while_index = -1
+
   def __init__(self, vm_writer, tokenizer):
     self.vm_writer    = vm_writer
     self.tokenizer    = tokenizer
@@ -143,7 +146,7 @@ class CompilationEngine:
 
       if 'let' == token:
         self.compileLet()
-      elif ' if ' == token:
+      elif 'if' == token:
         self.compileIf()
       elif 'while' == token:
         self.compileWhile()
@@ -200,42 +203,34 @@ class CompilationEngine:
 
       self.vm_writer.writePop(var_kind, var_index)
 
-    # self.write_open_tag('letStatement')
-    # self.write_next_token()       # 'let'
-    # self.write_next_token()       # varName
-
-    # if ' [ ' in self.current_token():      # ('[' expression ']')?
-    #   self.write_next_token()     # '['
-    #   self.compileExpression()    # expression
-    #   self.write_next_token()     # ']'
-
-    # self.write_next_token()       # '='
-    # self.compileExpression()      # expression
-    # self.write_next_token()       # ';'
-    # self.write_close_tag('letStatement')
-
   # 'while' '(' expression ')' '{' statements '}'
   def compileWhile(self):
-    pass
-    # self.write_open_tag('whileStatement')
-    # self.write_next_token()     # 'while'
-    # self.write_next_token()     # '('
-    # self.compileExpression()    # expression
-    # self.write_next_token()     # ')'
-    # self.write_next_token()     # '{'
-    # self.compileStatements()    # statements
-    # self.write_next_token()     # '}'
-    # self.write_close_tag('whileStatement')
+    self.while_index += 1
+    while_index = self.while_index
+
+    self.vm_writer.writeLabel('WHILE{}\n'.format(while_index))
+
+    self.get_token() # '('
+    self.compileExpression() # expression
+    self.vm_writer.writeArithmetic('NOT') # eval false condition first
+    self.get_token() # ')'
+    self.get_token() # '{'
+
+    self.vm_writer.writeIf('WHILE_END{}\n'.format(while_index))
+    self.compileStatements() # statements
+    self.vm_writer.writeGoto('WHILE{}\n'.format(while_index))
+    self.vm_writer.writeLabel('WHILE_END{}\n'.format(while_index))
+
+    self.get_token() # '}'
 
   # 'return' expression? ';'
   def compileReturn(self):
-    # if expression:
-    # self.compileExpression()
-    # else:
-    self.vm_writer.writePush('CONST', 0)
+    if self.peek() != ';':
+      self.compileExpression()
+    else:
+      self.vm_writer.writePush('CONST', 0)
 
     self.vm_writer.writeReturn()
-
     self.get_token() # ';'
 
     # self.write_open_tag('returnStatement')
@@ -249,23 +244,32 @@ class CompilationEngine:
 
   # 'if' '(' expression ')' '{' statements '}' ( 'else' '{' statements '}' )?
   def compileIf(self):
-    pass
-    # self.write_open_tag('ifStatement')
-    # self.write_next_token()     # if
-    # self.write_next_token()     # '('
-    # self.compileExpression()    # expression
-    # self.write_next_token()     # ')'
-    # self.write_next_token()     # '{'
-    # self.compileStatements()    # statements
-    # self.write_next_token()     # '}'
+    self.if_index += 1
+    if_index = self.if_index
 
-    # if 'else' in self.current_token(): # else?
-    #   self.write_next_token()   # else
-    #   self.write_next_token()   # '{'
-    #   self.compileStatements()  # statements
-    #   self.write_next_token()   # '}'
+    self.get_token()     # '('
+    self.compileExpression()    # expression
+    self.get_token()     # ')'
 
-    # self.write_close_tag('ifStatement')
+    self.get_token() # '{'
+
+    self.vm_writer.writeIf('IF_TRUE{}\n'.format(if_index))
+    self.vm_writer.writeGoto('IF_FALSE{}\n'.format(if_index))
+    self.vm_writer.writeLabel('IF_TRUE{}\n'.format(if_index))
+    self.compileStatements() # statements
+    self.vm_writer.writeGoto('IF_END{}\n'.format(if_index))
+
+    self.get_token() # '}'
+
+    self.vm_writer.writeLabel('IF_FALSE{}\n'.format(if_index))
+
+    if self.peek() == 'else': # ( 'else' '{' statements '}' )?
+      self.get_token() # 'else'
+      self.get_token() # '{'
+      self.compileStatements() # statements
+      self.get_token() # '}'
+
+    self.vm_writer.writeLabel('IF_END{}\n'.format(if_index))
 
   # term (op term)*
   def compileExpression(self):
@@ -293,11 +297,11 @@ class CompilationEngine:
       self.get_token()          # '('
       self.compileExpression()  # expression
       self.get_token()          # ')'
-    elif self.is_number():    # integerConstant
+    elif self.peek_type() == 'INT_CONST':    # integerConstant
       self.vm_writer.writePush('CONST', self.get_token())
-    elif self.is_string():    # stringConstant
+    elif self.peek_type() == 'STRING_CONST':    # stringConstant
       self.vm_writer.write('STRING CONST not implemented')
-    elif self.is_keyword_constant():   # keywordConstant
+    elif self.peek_type() == 'KEYWORD':   # keywordConstant
       self.compile_keyword()
     else: # first is a var or subroutine
       identifier = self.get_token() # identifier
@@ -344,7 +348,9 @@ class CompilationEngine:
     self.vm_writer.writePush('CONST', 0)
 
     if self.peek() == 'true':
-      self.vm_writer.writeArithmetic('NEG')
+      self.vm_writer.writeArithmetic('NOT')
+
+    self.get_token() # keywordConstant
 
   def is_class_var_dec(self):
     return False
@@ -364,28 +370,28 @@ class CompilationEngine:
   def is_unary_op_term(self):
     return self.peek() in ['~', '-']
 
-  def is_number(self):
-    return unicode(self.peek()).isnumeric()
-
-  def is_string(self):
-    return self.peek() == '"'
-
-  def is_keyword_constant(self):
-    return self.peek() in ['true', 'false', 'null']
-
   # TODO: peek method look further ahead
   def peek(self):
-    token = self.get_token()
-    self.unget_token(token)
-    return token
+    return self.peek_info()[0]
+
+  def peek_type(self):
+    return self.peek_info()[1]
+
+  def peek_info(self):
+    token_info = self.get_token_info()
+    self.unget_token_info(token_info)
+    return token_info
 
   def get_token(self):
+    return self.get_token_info()[0]
+
+  def get_token_info(self):
     if self.buffer:
       return self.buffer.pop(0)
     else:
       return self.get_next_token()
 
-  def unget_token(self, token):
+  def unget_token_info(self, token):
     self.buffer.append(token)
 
   def get_next_token(self):
@@ -393,12 +399,12 @@ class CompilationEngine:
       self.tokenizer.advance()
 
       if self.tokenizer.tokenType() is 'KEYWORD':
-        return self.tokenizer.keyWord().lower()
+        return (self.tokenizer.keyWord().lower(), self.tokenizer.tokenType())
       elif self.tokenizer.tokenType() is 'SYMBOL':
-        return self.tokenizer.symbol()
+        return (self.tokenizer.symbol(), self.tokenizer.tokenType())
       elif self.tokenizer.tokenType() is 'IDENTIFIER':
-        return self.tokenizer.identifier()
+        return (self.tokenizer.identifier(), self.tokenizer.tokenType())
       elif self.tokenizer.tokenType() is 'INT_CONST':
-        return self.tokenizer.intVal()
+        return (self.tokenizer.intVal(), self.tokenizer.tokenType())
       elif self.tokenizer.tokenType() is 'STRING_CONST':
-        return self.tokenizer.stringVal()
+        return (self.tokenizer.stringVal(), self.tokenizer.tokenType())

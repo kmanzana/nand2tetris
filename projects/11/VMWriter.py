@@ -17,6 +17,8 @@ class VMWriter:
   def writePush(self, segment, index):
     if segment == 'CONST':
       segment = 'constant'
+    elif segment == 'ARG':
+      segment = 'argument'
 
     self.output.write('push {} {}\n'.format(segment.lower(), index))
 
@@ -25,6 +27,8 @@ class VMWriter:
   def writePop(self, segment, index):
     if segment == 'CONST':
       segment = 'constant'
+    elif segment == 'ARG':
+      segment = 'argument'
 
     self.output.write('pop {} {}\n'.format(segment.lower(), index))
 
