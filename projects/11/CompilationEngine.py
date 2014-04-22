@@ -70,7 +70,7 @@ class CompilationEngine:
     while self.peek() != ';': # (',' varName)*
       self.get_token() # ','
       name = self.get_token() # varName
-      self.symbol_table.define(name, type, 'VAR')
+      self.symbol_table.define(name, type, kind.upper())
 
     self.get_token() # ';'
 
