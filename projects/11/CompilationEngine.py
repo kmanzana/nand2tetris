@@ -61,23 +61,29 @@ class CompilationEngine:
 
   # ('static' | 'field' ) type varName (',' varName)* ';'
   def compileClassVarDec(self):
-    pass
-    # self.write_open_tag('classVarDec')
-    # self.write_next_token()                   # ('static' | 'field' )
-    # self.write_next_token()                   # type
-    # self.write_next_token()                   # varName
-    # self.compile_multiple(',', 'identifier')  # (',' varName)*
-    # self.write_next_token()                   # ';'
-    # self.write_close_tag('classVarDec')
+    kind = self.get_token() # ('static' | 'field' )
+    type = self.get_token() # type
+    name = self.get_token() # varName
+
+    self.symbol_table.define(name, type, kind.upper())
+
+    while self.peek() != ';': # (',' varName)*
+      self.get_token() # ','
+      name = self.get_token() # varName
+      self.symbol_table.define(name, type, 'VAR')
+
+    self.get_token() # ';'
 
   # subroutineDec: ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' parameterList ')' subroutineBody
   # subroutineBody: '{' varDec* statements '}'
   def compileSubroutine(self):
-    # for constructor call memory.alloc
     subroutine_kind = self.get_token() # ('constructor' | 'function' | 'method')
     self.get_token()                    # ('void' | type)
     subroutine_name = self.get_token()  # subroutineName
     self.symbol_table.startSubroutine()
+
+    # if subroutine_kind == 'method':
+    #   self.symbol_table.define('instance', self.class_name, 'ARG')
 
     self.get_token() # '('
     self.compileParameterList()   # parameterList
@@ -90,6 +96,15 @@ class CompilationEngine:
     function_name = '{}.{}'.format(self.class_name, subroutine_name)
     num_locals = self.symbol_table.varCount('VAR')
     self.vm_writer.writeFunction(function_name, num_locals)
+
+    if subroutine_kind == 'constructor':
+      num_fields = self.symbol_table.varCount('FIELD')
+      self.vm_writer.writePush('CONST', num_fields)
+      self.vm_writer.writeCall('Memory.alloc', 1)
+      self.vm_writer.writePop('POINTER', 0)
+    elif subroutine_kind == 'method':
+      self.vm_writer.writePush('ARG', 0)
+      self.vm_writer.writePop('POINTER', 0)
 
     self.compileStatements() # statements
     self.get_token() # '}'
@@ -221,15 +236,6 @@ class CompilationEngine:
     self.vm_writer.writeReturn()
     self.get_token() # ';'
 
-    # self.write_open_tag('returnStatement')
-    # self.write_next_token()     # 'return'
-
-    # if ' ; ' not in self.current_token():    # expression?
-    #   self.compileExpression()  # expression
-
-    # self.write_next_token()     # ';'
-    # self.write_close_tag('returnStatement')
-
   # 'if' '(' expression ')' '{' statements '}' ( 'else' '{' statements '}' )?
   def compileIf(self):
     self.if_index += 1
@@ -321,12 +327,15 @@ class CompilationEngine:
 
   # private
   def compile_keyword(self):
-    self.vm_writer.writePush('CONST', 0)
+    keyword = self.get_token() # keywordConstant
 
-    if self.peek() == 'true':
-      self.vm_writer.writeArithmetic('NOT')
+    if keyword == 'this':
+      self.vm_writer.writePush('POINTER', 0)
+    else:
+      self.vm_writer.writePush('CONST', 0)
 
-    self.get_token() # keywordConstant
+      if keyword == 'true':
+        self.vm_writer.writeArithmetic('NOT')
 
   # subroutineCall: subroutineName '(' expressionList ')' | ( className | varName) '.' subroutineName '(' expressionList ')'
   def compile_subroutine_call(self):
@@ -351,6 +360,12 @@ class CompilationEngine:
       else: # it's a class
         class_name = identifier
         function_name = '{}.{}'.format(class_name, subroutine_name)
+    elif '(' == self.peek():
+      subroutine_name = identifier
+      function_name = '{}.{}'.format(self.class_name, subroutine_name)
+      number_args += 1
+
+      self.vm_writer.writePush('POINTER', 0)
 
     self.get_token()              # '('
     number_args += self.compileExpressionList()  # expressionList
@@ -373,8 +388,7 @@ class CompilationEngine:
     return array
 
   def is_class_var_dec(self):
-    return False
-    # return 'static' in self.current_token() or 'field' in self.current_token()
+    return self.peek() in ['static', 'field']
 
   def is_subroutine_dec(self):
     return self.peek() in ['constructor', 'function', 'method']
