@@ -82,8 +82,8 @@ class CompilationEngine:
     subroutine_name = self.get_token()  # subroutineName
     self.symbol_table.startSubroutine()
 
-    # if subroutine_kind == 'method':
-    #   self.symbol_table.define('instance', self.class_name, 'ARG')
+    if subroutine_kind == 'method':
+      self.symbol_table.define('instance', self.class_name, 'ARG')
 
     self.get_token() # '('
     self.compileParameterList()   # parameterList
@@ -124,19 +124,6 @@ class CompilationEngine:
       name = self.get_token() # varName
 
       self.symbol_table.define(name, type, 'ARG')
-
-    # self.write_open_tag('parameterList')
-
-    # if ' ) ' not in self.current_token():
-    #   self.write_next_token()  # type
-    #   self.write_next_token()  # varName
-
-    # while ' ) ' not in self.current_token():
-    #   self.write_next_token()  # ','
-    #   self.write_next_token()  # type
-    #   self.write_next_token()  # varName
-
-    # self.write_close_tag('parameterList')
 
   # 'var' type varName (',' varName)* ';'
   def compileVarDec(self):
@@ -397,14 +384,12 @@ class CompilationEngine:
     token = self.get_token()
     subroutine_call = self.peek() in ['.', '(']
     self.unget_token(token)
-    self.peek() # reset buffer
     return subroutine_call
 
   def is_array(self):
     token = self.get_token()
     array = self.peek() == '['
     self.unget_token(token)
-    self.peek() # reset buffer
     return array
 
   def is_class_var_dec(self):
