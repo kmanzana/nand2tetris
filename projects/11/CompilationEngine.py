@@ -36,8 +36,6 @@ class CompilationEngine:
     '~': 'NOT'
   }
 
-  KEYWORD_CONSTANTS = ['true', 'false', 'null', 'this']
-
   def __init__(self, vm_writer, tokenizer):
     self.vm_writer    = vm_writer
     self.tokenizer    = tokenizer
@@ -72,10 +70,10 @@ class CompilationEngine:
   # subroutineDec: ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' parameterList ')' subroutineBody
   # subroutineBody: '{' varDec* statements '}'
   def compileSubroutine(self):
-    # for constructor call memory.all
+    # for constructor call memory.alloc
     subroutine_kind = self.get_token() # ('constructor' | 'function' | 'method')
-    return_value = self.get_token() # ('void' | type)
-    subroutine_name = self.get_token() # subroutineName
+    self.get_token()                    # ('void' | type)
+    subroutine_name = self.get_token()  # subroutineName
     self.symbol_table.startSubroutine()
 
     self.get_token() # '('
@@ -95,7 +93,19 @@ class CompilationEngine:
 
   # ( (type varName) (',' type varName)*)?
   def compileParameterList(self):
-    pass
+    if ')' != self.peek():
+      type = self.get_token() # type
+      name = self.get_token() # varName
+
+      self.symbol_table.define(name, type, 'ARG')
+
+    while ')' != self.peek():
+      self.get_token() # ','
+
+      type = self.get_token() # type
+      name = self.get_token() # varName
+
+      self.symbol_table.define(name, type, 'ARG')
 
     # self.write_open_tag('parameterList')
 
@@ -226,6 +236,8 @@ class CompilationEngine:
 
     self.vm_writer.writeReturn()
 
+    self.get_token() # ';'
+
     # self.write_open_tag('returnStatement')
     # self.write_next_token()     # 'return'
 
@@ -270,15 +282,6 @@ class CompilationEngine:
       elif op == '/':
         self.vm_writer.writeCall('Math.divide', 2)
 
-    # self.write_open_tag('expression')
-    # self.compileTerm() # term
-
-    # while self.is_op():
-    #   self.write_next_token() # op
-    #   self.compileTerm()      # term
-
-    # self.write_close_tag('expression')
-
   # integerConstant | stringConstant | keywordConstant | varName |
   # varName '[' expression ']' | subroutineCall | '(' expression ')' | unaryOp term
   def compileTerm(self):
@@ -294,8 +297,8 @@ class CompilationEngine:
       self.vm_writer.writePush('CONST', self.get_token())
     elif self.is_string():    # stringConstant
       self.vm_writer.write('STRING CONST not implemented')
-    elif self.is_keyword():   # keywordConstant
-      self.vm_writer.write('KEYWORD CONST not implemented')
+    elif self.is_keyword_constant():   # keywordConstant
+      self.compile_keyword()
     else: # first is a var or subroutine
       identifier = self.get_token() # identifier
 
@@ -321,35 +324,6 @@ class CompilationEngine:
         var_index = self.symbol_table.indexOf(identifier)
         self.vm_writer.writePush(var_kind, var_index)
 
-    # self.write_open_tag('term')
-
-    # if self.is_unary_op_term():
-    #   self.write_next_token()   # unaryOp
-    #   self.compileTerm()        # term
-    # elif ' ( ' in self.current_token():
-    #   self.write_next_token()   # '('
-    #   self.compileExpression()  # expression
-    #   self.write_next_token()   # ')'
-    # else: # first is an identifier
-    #   self.write_next_token() # identifier
-
-    #   if ' [ ' in self.current_token():
-    #     self.write_next_token() # '['
-    #     self.compileExpression() # expression
-    #     self.write_next_token() # ']'
-    #   elif ' . ' in self.current_token():
-    #     self.write_next_token()       # '.'
-    #     self.write_next_token()       # subroutineName
-    #     self.write_next_token()       # '('
-    #     self.compileExpressionList()  # expressionList
-    #     self.write_next_token()       # ')'
-    #   elif ' ( ' in self.current_token():
-    #     self.write_next_token()       # '('
-    #     self.compileExpressionList()  # expressionList
-    #     self.write_next_token()       # ')'
-
-    # self.write_close_tag('term')
-
   # (expression (',' expression)* )?
   def compileExpressionList(self):
     number_args = 0
@@ -366,6 +340,12 @@ class CompilationEngine:
     return number_args
 
   # private
+  def compile_keyword(self):
+    self.vm_writer.writePush('CONST', 0)
+
+    if self.peek() == 'true':
+      self.vm_writer.writeArithmetic('NEG')
+
   def is_class_var_dec(self):
     return False
     # return 'static' in self.current_token() or 'field' in self.current_token()
@@ -390,8 +370,8 @@ class CompilationEngine:
   def is_string(self):
     return self.peek() == '"'
 
-  def is_keyword(self):
-    return self.peek() in self.KEYWORD_CONSTANTS
+  def is_keyword_constant(self):
+    return self.peek() in ['true', 'false', 'null']
 
   # TODO: peek method look further ahead
   def peek(self):
