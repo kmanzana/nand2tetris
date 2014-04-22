@@ -183,11 +183,11 @@ class CompilationEngine:
     var_index = self.symbol_table.indexOf(var_name)
 
     if '[' == self.peek(): # array assignment
-      self.vm_writer.writePush(var_kind, var_index)
-
       self.get_token() # '['
       self.compileExpression() # expression
       self.get_token() # ']'
+
+      self.vm_writer.writePush(var_kind, var_index)
 
       self.vm_writer.writeArithmetic('ADD')
       self.vm_writer.writePop('TEMP', 0)
@@ -294,14 +294,24 @@ class CompilationEngine:
     elif self.peek_type() == 'INT_CONST':    # integerConstant
       self.vm_writer.writePush('CONST', self.get_token())
     elif self.peek_type() == 'STRING_CONST':    # stringConstant
-      self.vm_writer.write('STRING CONST not implemented')
+      self.compile_string()
     elif self.peek_type() == 'KEYWORD':   # keywordConstant
       self.compile_keyword()
     else: # first is a var or subroutine
       if self.is_array():
+        array_var = self.get_token() # varName
+
         self.get_token()          # '['
         self.compileExpression()  # expression
         self.get_token()          # ']'
+
+        array_kind = self.symbol_table.kindOf(array_var)
+        array_index = self.symbol_table.indexOf(array_var)
+        self.vm_writer.writePush(self.CONVERT_KIND[array_kind], array_index)
+
+        self.vm_writer.writeArithmetic('ADD')
+        self.vm_writer.writePop('POINTER', 1)
+        self.vm_writer.writePush('THAT', 0)
       elif self.is_subroutine_call():
         self.compile_subroutine_call()
       else:
@@ -373,6 +383,16 @@ class CompilationEngine:
 
     self.vm_writer.writeCall(function_name, number_args)
 
+  def compile_string(self):
+    string = self.get_token() # stringConstant
+
+    self.vm_writer.writePush('CONST', len(string))
+    self.vm_writer.writeCall('String.new', 1)
+
+    for char in string:
+      self.vm_writer.writePush('CONST', ord(char))
+      self.vm_writer.writeCall('String.appendChar', 2)
+
   def is_subroutine_call(self):
     token = self.get_token()
     subroutine_call = self.peek() in ['.', '(']
@@ -429,7 +449,7 @@ class CompilationEngine:
     self.unget_token_info((token, 'UNKNOWN'))
 
   def unget_token_info(self, token):
-    self.buffer.append(token)
+    self.buffer.insert(0, token)
 
   def get_next_token(self):
     if self.tokenizer.hasMoreTokens():
