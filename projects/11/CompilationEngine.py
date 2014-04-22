@@ -60,6 +60,7 @@ class CompilationEngine:
   # subroutineDec: ('constructor' | 'function' | 'method') ('void' | type) subroutineName '(' parameterList ')' subroutineBody
   # subroutineBody: '{' varDec* statements '}'
   def compileSubroutine(self):
+    # for constructor call memory.all
     subroutine_kind = self.get_token() # ('constructor' | 'function' | 'method')
     return_value = self.get_token() # ('void' | type)
     subroutine_name = self.get_token() # subroutineName
