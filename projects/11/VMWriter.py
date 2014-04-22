@@ -13,12 +13,20 @@ class VMWriter:
     self.output = output_file
 
   # Writes a VM push command
+  # CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
   def writePush(self, segment, index):
-    self.output.write('push {} {}\n'.format(segment, index))
+    if segment == 'CONST':
+      segment = 'constant'
+
+    self.output.write('push {} {}\n'.format(segment.lower(), index))
 
   # Writes a VM pop command
+  # CONST, ARG, LOCAL, STATIC, THIS, THAT, POINTER, TEMP
   def writePop(self, segment, index):
-    self.output.write('pop {} {}\n'.format(segment, index))
+    if segment == 'CONST':
+      segment = 'constant'
+
+    self.output.write('pop {} {}\n'.format(segment.lower(), index))
 
   # Writes a VM arithmetic command
   # command (ADD, SUB, NEG, EQ, GT, LT, AND, OR, NOT)

@@ -22,14 +22,14 @@ class TestSymbolTable(unittest.TestCase):
     self.symbol_table.define('foo', 'int', 'STATIC')
 
     assert self.symbol_table.counts['STATIC'] == 1
-    assert self.symbol_table.class_scope['foo'] == ('int', 'STATIC', 1)
+    assert self.symbol_table.class_scope['foo'] == ('int', 'STATIC', 0)
 
   def test_define_field(self):
     self.symbol_table.define('bar', 'Snake', 'VAR')
     self.symbol_table.define('foo', 'int', 'FIELD')
 
     assert self.symbol_table.counts['VAR'] == 1
-    assert self.symbol_table.subroutine_scope['bar'] == ('Snake', 'VAR', 1)
+    assert self.symbol_table.subroutine_scope['bar'] == ('Snake', 'VAR', 0)
 
   def test_varCount(self):
     self.symbol_table.define('foo', 'int', 'FIELD')
@@ -56,9 +56,9 @@ class TestSymbolTable(unittest.TestCase):
     self.symbol_table.define('bar', 'char', 'FIELD')
     self.symbol_table.define('qaz', 'char', 'STATIC')
 
-    assert self.symbol_table.indexOf('foo') == 1
-    assert self.symbol_table.indexOf('bar') == 2
-    assert self.symbol_table.indexOf('qaz') == 2
+    assert self.symbol_table.indexOf('foo') == 0
+    assert self.symbol_table.indexOf('bar') == 1
+    assert self.symbol_table.indexOf('qaz') == 1
     assert self.symbol_table.indexOf('quz') == 'NONE'
 
 unittest.main()

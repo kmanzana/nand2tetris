@@ -9,6 +9,8 @@
 #============================================================
 
 class SymbolTable:
+  static_scope = {}
+
   counts = {
     'STATIC': 0,
     'FIELD':  0,
@@ -20,7 +22,7 @@ class SymbolTable:
     self.counts['FIELD']  = 0
 
     self.subroutine_scope = {}
-    self.class_scope      = {}
+    self.field_scope      = {}
 
   def startSubroutine(self):
     self.subroutine_scope = {}
@@ -32,22 +34,22 @@ class SymbolTable:
 
     if kind == 'ARG' or kind == 'VAR':
       if kind == 'ARG':
-        self.counts['ARG'] += 1
         number = self.counts['ARG']
+        self.counts['ARG'] += 1
       elif kind == 'VAR':
-        self.counts['VAR'] += 1
         number = self.counts['VAR']
+        self.counts['VAR'] += 1
 
       self.subroutine_scope[name] = (type, kind, number)
     elif kind == 'STATIC' or kind == 'FIELD':
       if kind == 'STATIC':
-        self.counts['STATIC'] += 1
         number = self.counts['STATIC']
+        self.counts['STATIC'] += 1
+        self.static_scope[name] = (type, kind, number)
       elif kind == 'FIELD':
-        self.counts['FIELD'] += 1
         number = self.counts['FIELD']
-
-      self.class_scope[name] = (type, kind, number)
+        self.counts['FIELD'] += 1
+        self.field_scope[name] = (type, kind, number)
 
   def varCount(self, kind):
     return self.counts[kind]
@@ -55,23 +57,29 @@ class SymbolTable:
   def kindOf(self, name):
     if name in self.subroutine_scope.keys():
       return self.subroutine_scope[name][1]
-    elif name in self.class_scope.keys():
-      return self.class_scope[name][1]
+    elif name in self.field_scope.keys():
+      return self.field_scope[name][1]
+    elif name in self.static_scope.keys():
+      return self.static_scope[name][1]
     else:
       return 'NONE'
 
   def typeOf(self, name):
     if name in self.subroutine_scope.keys():
       return self.subroutine_scope[name][0]
-    elif name in self.class_scope.keys():
-      return self.class_scope[name][0]
+    elif name in self.field_scope.keys():
+      return self.field_scope[name][0]
+    elif name in self.static_scope.keys():
+      return self.static_scope[name][0]
     else:
       return 'NONE'
 
   def indexOf(self, name):
     if name in self.subroutine_scope.keys():
       return self.subroutine_scope[name][2]
-    elif name in self.class_scope.keys():
-      return self.class_scope[name][2]
+    elif name in self.field_scope.keys():
+      return self.field_scope[name][2]
+    elif name in self.static_scope.keys():
+      return self.static_scope[name][2]
     else:
       return'NONE'

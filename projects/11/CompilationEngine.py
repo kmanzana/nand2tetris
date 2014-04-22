@@ -14,17 +14,29 @@ import re
 from SymbolTable import SymbolTable
 
 class CompilationEngine:
+  CONVERT_KIND = {
+    'ARG': 'ARG',
+    'STATIC': 'STATIC',
+    'VAR': 'LOCAL',
+    'FIELD': 'THIS'
+  }
+
   ARITHMETIC = {
     '+': 'ADD',
     '-': 'SUB',
-    # '': 'NEG',
     '=': 'EQ',
     '>': 'GT',
     '<': 'LT',
     '&': 'AND',
-    '|': 'OR',
+    '|': 'OR'
+  }
+
+  ARITHMETIC_UNARY = {
+    '-': 'NEG',
     '~': 'NOT'
   }
+
+  KEYWORD_CONSTANTS = ['true', 'false', 'null', 'this']
 
   def __init__(self, vm_writer, tokenizer):
     self.vm_writer    = vm_writer
@@ -146,11 +158,38 @@ class CompilationEngine:
     self.get_token() # ';'
 
     self.vm_writer.writeCall(function_name, number_args)
-    self.vm_writer.writePop('temp', 0)
+    self.vm_writer.writePop('TEMP', 0)
 
   # 'let' varName ('[' expression ']')? '=' expression ';'
   def compileLet(self):
-    pass
+    var_name = self.get_token() # varName
+    var_kind  = self.CONVERT_KIND[self.symbol_table.kindOf(var_name)]
+    var_index = self.symbol_table.indexOf(var_name)
+
+    if '[' == self.peek(): # array assignment
+      self.vm_writer.writePush(var_kind, var_index)
+
+      self.get_token() # '['
+      self.compileExpression() # expression
+      self.get_token() # ']'
+
+      self.vm_writer.writeArithmetic('ADD')
+      self.vm_writer.writePop('TEMP', 0)
+
+      self.get_token() # '='
+      self.compileExpression()      # expression
+      self.get_token() # ';'
+
+      self.vm_writer.writePush('TEMP', 0)
+      self.vm_writer.writePop('POINTER', 1)
+      self.vm_writer.writePop('THAT', 0)
+    else: # regular assignment
+      self.get_token() # '='
+      self.compileExpression()      # expression
+      self.get_token() # ';'
+
+      self.vm_writer.writePop(var_kind, var_index)
+
     # self.write_open_tag('letStatement')
     # self.write_next_token()       # 'let'
     # self.write_next_token()       # varName
@@ -183,7 +222,7 @@ class CompilationEngine:
     # if expression:
     # self.compileExpression()
     # else:
-    self.vm_writer.writePush('constant', 0)
+    self.vm_writer.writePush('CONST', 0)
 
     self.vm_writer.writeReturn()
 
@@ -220,9 +259,9 @@ class CompilationEngine:
   def compileExpression(self):
     self.compileTerm() # term
 
-    while self.is_op():
-      op = self.get_token()
-      self.compileTerm()
+    while self.is_op(): # (op term)*
+      op = self.get_token() # op
+      self.compileTerm() # term
 
       if op in self.ARITHMETIC.keys():
         self.vm_writer.writeArithmetic(self.ARITHMETIC[op])
@@ -244,31 +283,43 @@ class CompilationEngine:
   # varName '[' expression ']' | subroutineCall | '(' expression ')' | unaryOp term
   def compileTerm(self):
     if self.is_unary_op_term():
-      self.write_next_token()   # unaryOp
+      unary_op = self.get_token()          # unaryOp
       self.compileTerm()        # term
+      self.vm_writer.writeArithmetic(self.ARITHMETIC_UNARY[unary_op])
     elif '(' == self.peek():
-      self.get_token()   # '('
+      self.get_token()          # '('
       self.compileExpression()  # expression
-      self.get_token()   # ')'
-    else: # first is an identifier
+      self.get_token()          # ')'
+    elif self.is_number():    # integerConstant
+      self.vm_writer.writePush('CONST', self.get_token())
+    elif self.is_string():    # stringConstant
+      self.vm_writer.write('STRING CONST not implemented')
+    elif self.is_keyword():   # keywordConstant
+      self.vm_writer.write('KEYWORD CONST not implemented')
+    else: # first is a var or subroutine
       identifier = self.get_token() # identifier
-      self.vm_writer.writePush('constant', identifier) # identifier
 
-      if '[' == token:
-        self.write_next_token() # '['
-        self.compileExpression() # expression
-        self.write_next_token() # ']'
-      elif '.' == token:
-        self.write_next_token()       # '.'
-        self.write_next_token()       # subroutineName
-        self.write_next_token()       # '('
-        self.compileExpressionList()  # expressionList
-        self.write_next_token()       # ')'
-      elif '(' == token:
-        self.write_next_token()       # '('
-        self.compileExpressionList()  # expressionList
-        self.write_next_token()       # ')'
+      if '[' == self.peek():
+        self.get_token()          # '['
+        self.compileExpression()  # expression
+        self.get_token()          # ']'
+      elif '.' == self.peek():
+        self.get_token()              # '.'
+        subroutine_name = self.get_token() # subroutineName
+        self.get_token()              # '('
+        number_args = self.compileExpressionList()  # expressionList
+        self.get_token()              # ')'
 
+        function_name = '{}.{}'.format(identifier, subroutine_name)
+        self.vm_writer.writeCall(function_name, number_args)
+      elif '(' == self.peek():
+        self.get_token()              # '('
+        self.compileExpressionList()  # expressionList
+        self.get_token()              # ')'
+      else:
+        var_kind  = self.CONVERT_KIND[self.symbol_table.kindOf(identifier)]
+        var_index = self.symbol_table.indexOf(identifier)
+        self.vm_writer.writePush(var_kind, var_index)
 
     # self.write_open_tag('term')
 
@@ -332,6 +383,15 @@ class CompilationEngine:
   # unaryOp: '-' | '~'
   def is_unary_op_term(self):
     return self.peek() in ['~', '-']
+
+  def is_number(self):
+    return unicode(self.peek()).isnumeric()
+
+  def is_string(self):
+    return self.peek() == '"'
+
+  def is_keyword(self):
+    return self.peek() in self.KEYWORD_CONSTANTS
 
   # TODO: peek method look further ahead
   def peek(self):
