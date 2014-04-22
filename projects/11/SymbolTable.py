@@ -9,13 +9,15 @@
 #============================================================
 
 class SymbolTable:
+  counts = {
+    'STATIC': 0,
+    'FIELD':  0,
+    'ARG':    0,
+    'VAR':    0
+  }
+
   def __init__(self):
-    self.counts = {
-      'STATIC': 0,
-      'FIELD':  0,
-      'ARG':    0,
-      'VAR':    0
-    }
+    self.counts['FIELD']  = 0
 
     self.subroutine_scope = {}
     self.class_scope      = {}

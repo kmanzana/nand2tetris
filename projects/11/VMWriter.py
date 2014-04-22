@@ -27,15 +27,15 @@ class VMWriter:
 
   # Writes a VM label command
   def writeLabel(self, label):
-    pass
+    self.output.write('label {}'.format(label))
 
   # Writes a VM label command
   def writeGoto(self, label):
-    pass
+    self.output.write('goto {}'.format(label))
 
   # Writes a VM If-goto command
   def writeIf(self, label):
-    pass
+    self.output.write('if-goto {}'.format(label))
 
   # Writes a VM call command
   def writeCall(self, name, nArgs):
