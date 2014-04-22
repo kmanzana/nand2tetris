@@ -156,22 +156,10 @@ class CompilationEngine:
         self.compileReturn()
 
   # 'do' subroutineCall ';'
-  # subroutineCall: subroutineName '(' expressionList ')' | ( className | varName) '.' subroutineName '(' expressionList ')'
   def compileDo(self):
-    function_name = self.get_token() # (subroutineName | className | varName)
-
-    token = self.get_token()
-
-    if '.' == token:
-      function_name += '.' + self.get_token() # '.' subroutineName
-
-    self.get_token() # '('
-    number_args = self.compileExpressionList()
-    self.get_token() # ')'
-    self.get_token() # ';'
-
-    self.vm_writer.writeCall(function_name, number_args)
+    self.compile_subroutine_call()
     self.vm_writer.writePop('TEMP', 0)
+    self.get_token() # ';'
 
   # 'let' varName ('[' expression ']')? '=' expression ';'
   def compileLet(self):
@@ -304,28 +292,16 @@ class CompilationEngine:
     elif self.peek_type() == 'KEYWORD':   # keywordConstant
       self.compile_keyword()
     else: # first is a var or subroutine
-      identifier = self.get_token() # identifier
-
-      if '[' == self.peek():
+      if self.is_array():
         self.get_token()          # '['
         self.compileExpression()  # expression
         self.get_token()          # ']'
-      elif '.' == self.peek():
-        self.get_token()              # '.'
-        subroutine_name = self.get_token() # subroutineName
-        self.get_token()              # '('
-        number_args = self.compileExpressionList()  # expressionList
-        self.get_token()              # ')'
-
-        function_name = '{}.{}'.format(identifier, subroutine_name)
-        self.vm_writer.writeCall(function_name, number_args)
-      elif '(' == self.peek():
-        self.get_token()              # '('
-        self.compileExpressionList()  # expressionList
-        self.get_token()              # ')'
+      elif self.is_subroutine_call():
+        self.compile_subroutine_call()
       else:
-        var_kind  = self.CONVERT_KIND[self.symbol_table.kindOf(identifier)]
-        var_index = self.symbol_table.indexOf(identifier)
+        var = self.get_token()
+        var_kind  = self.CONVERT_KIND[self.symbol_table.kindOf(var)]
+        var_index = self.symbol_table.indexOf(var)
         self.vm_writer.writePush(var_kind, var_index)
 
   # (expression (',' expression)* )?
@@ -351,6 +327,50 @@ class CompilationEngine:
       self.vm_writer.writeArithmetic('NOT')
 
     self.get_token() # keywordConstant
+
+  # subroutineCall: subroutineName '(' expressionList ')' | ( className | varName) '.' subroutineName '(' expressionList ')'
+  def compile_subroutine_call(self):
+    identifier = self.get_token() # (subroutineName | className | varName)
+    function_name = identifier
+    number_args = 0
+
+    if '.' == self.peek():
+      self.get_token()                    # '.'
+      subroutine_name = self.get_token()  # subroutineName
+
+      type = self.symbol_table.typeOf(identifier)
+
+      if type != 'NONE': # it's an instance
+        instance_kind = self.symbol_table.kindOf(identifier)
+        instance_index = self.symbol_table.indexOf(identifier)
+
+        self.vm_writer.writePush(self.CONVERT_KIND[instance_kind], instance_index)
+
+        function_name = '{}.{}'.format(type, subroutine_name)
+        number_args += 1
+      else: # it's a class
+        class_name = identifier
+        function_name = '{}.{}'.format(class_name, subroutine_name)
+
+    self.get_token()              # '('
+    number_args += self.compileExpressionList()  # expressionList
+    self.get_token()              # ')'
+
+    self.vm_writer.writeCall(function_name, number_args)
+
+  def is_subroutine_call(self):
+    token = self.get_token()
+    subroutine_call = self.peek() in ['.', '(']
+    self.unget_token(token)
+    self.peek() # reset buffer
+    return subroutine_call
+
+  def is_array(self):
+    token = self.get_token()
+    array = self.peek() == '['
+    self.unget_token(token)
+    self.peek() # reset buffer
+    return array
 
   def is_class_var_dec(self):
     return False
@@ -390,6 +410,9 @@ class CompilationEngine:
       return self.buffer.pop(0)
     else:
       return self.get_next_token()
+
+  def unget_token(self, token):
+    self.unget_token_info((token, 'UNKNOWN'))
 
   def unget_token_info(self, token):
     self.buffer.append(token)
