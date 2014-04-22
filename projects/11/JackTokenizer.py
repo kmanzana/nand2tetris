@@ -22,7 +22,8 @@ class JackTokenizer:
     'IDENTIFIER']
 
   KEYWORD          = ('(class|constructor|function|method|field|static|var|int|'
-    'char|boolean|void|true|false|null|this|let|do|if|else|while|return)')
+    'char|boolean|void|true|false|null|this|let|do|if|else|while|return)'
+    '(?=[^\w])')
   SYMBOL           = '([{}()[\].,;+\-*/&|<>=~])'
   INT_CONST        = '(\d+)'
   STRING_CONST     = '\"([^\n]*)\"'
@@ -48,7 +49,6 @@ class JackTokenizer:
   def hasMoreTokens(self):
     return not not self.next_token
 
-  # TODO: advance should output string to token file
   def advance(self):
     self.current_token = self.next_token
 
