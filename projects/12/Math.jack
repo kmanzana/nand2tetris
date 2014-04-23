@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:......... KMANZANA
+// PROGRAMMER:..... Manzanares, Kelton M.
+// COURSE:......... CSCI-410
+// TERM:........... SP14
+// PROJECT:........ ECS12
+// FILENAME:....... Math.jack
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/12/Math.jack
@@ -7,32 +16,52 @@
  * A basic math library.
  */
 class Math {
+  /** Initializes the library. */
+  function void init() {
+    // create sqrt mask lut
+    return;
+  }
 
-    /** Initializes the library. */
-    function void init() {
-    }
+  /** Returns the absolute value of x. */
+  function int abs(int x) {
+    return x;
+  }
 
-    /** Returns the absolute value of x. */
-    function int abs(int x) {
-    }
+  /** Returns the product of x and y. */
+  function int multiply(int x, int y) {
+    return x;
+  }
 
-    /** Returns the product of x and y. */
-    function int multiply(int x, int y) {
-    }
+  /** Returns the integer part of x/y. */
+  function int divide(int x, int y) {
+    return x;
+  }
 
-    /** Returns the integer part of x/y. */
-    function int divide(int x, int y) {
-    }
+  /** Returns the integer part of the square root of x. */
+  function int sqrt(int x) {
+    // start comparison at 128
+    // use 8 masks
 
-    /** Returns the integer part of the square root of x. */
-    function int sqrt(int x) {
-    }
+    // square x
+    // mask on first bit of tester
+    // if tester > x
+    //    unmask it
+    // else
+    //    leave it
+    // end
 
-    /** Returns the greater number. */
-    function int max(int a, int b) {
-    }
+    // return tester
 
-    /** Returns the smaller number. */
-    function int min(int a, int b) {
-    }
+    return x;
+  }
+
+  /** Returns the greater number. */
+  function int max(int a, int b) {
+    return a;
+  }
+
+  /** Returns the smaller number. */
+  function int min(int a, int b) {
+    return a;
+  }
 }
