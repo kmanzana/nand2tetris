@@ -24,11 +24,25 @@ class Math {
 
   /** Returns the absolute value of x. */
   function int abs(int x) {
+    if (x < 0) {
+      let x = -x;
+    }
+
     return x;
   }
 
   /** Returns the product of x and y. */
   function int multiply(int x, int y) {
+    var int sum, shifted_x;
+
+    let sum = 0;
+    let shifted_x = x;
+
+    for j = 0..(n−1) do
+      if (j-th bit of y) = 1 then
+        sum = sum + shiftedX
+      shiftedX = shiftedX * 2
+
     return x;
   }
 
