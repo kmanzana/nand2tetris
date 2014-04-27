@@ -35,24 +35,68 @@ class Math {
   function int multiply(int x, int y) {
     var int sum, shifted_x;
 
+    if (x < 0) {
+      return -Math.multiply(-x, y);
+    }
+
+    if (y < 0) {
+      return -Math.multiply(x, -y);
+    }
+
     let sum = 0;
-    let shifted_x = x;
 
-    for j = 0..(n−1) do
-      if (j-th bit of y) = 1 then
-        sum = sum + shiftedX
-      shiftedX = shiftedX * 2
+    while (x > 0) {
+      let sum = sum + y;
+      let x = x - 1;
+    }
 
-    return x;
+    // let shifted_x = x;
+    // for j = 0..(n−1) do
+    //   if (j-th bit of y) = 1 then
+    //     sum = sum + shiftedX
+    //   shiftedX = shiftedX * 2
+
+    return sum;
   }
 
   /** Returns the integer part of x/y. */
   function int divide(int x, int y) {
-    return x;
+    var int quotient;
+
+    if (x < 0) {
+      return -Math.divide(-x, y);
+    }
+
+    if (y < 0) {
+      return -Math.divide(x, -y);
+    }
+
+    let quotient = 0;
+
+    while ((x > y) | (x = y)) {
+      let quotient = quotient + 1;
+      let x = x - y;
+    }
+
+    return quotient;
   }
 
   /** Returns the integer part of the square root of x. */
   function int sqrt(int x) {
+    var int test, test_square;
+
+    let test = 1;
+
+    while (test < 181) {
+      let test_square = test * test;
+
+      if (test_square > x) {
+        return test - 1;
+      }
+
+      let test = test + 1;
+    }
+
     // start comparison at 128
     // use 8 masks
 
@@ -66,16 +110,24 @@ class Math {
 
     // return tester
 
-    return x;
+    return 181;
   }
 
   /** Returns the greater number. */
   function int max(int a, int b) {
-    return a;
+    if (a > b) {
+      return a;
+    }
+
+    return b;
   }
 
   /** Returns the smaller number. */
   function int min(int a, int b) {
-    return a;
+    if (a < b) {
+      return a;
+    }
+
+    return b;
   }
 }
