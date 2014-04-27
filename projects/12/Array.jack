@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:......... KMANZANA
+// PROGRAMMER:..... Manzanares, Kelton M.
+// COURSE:......... CSCI-410
+// TERM:........... SP14
+// PROJECT:........ ECS12
+// FILENAME:....... Array.jack
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/12/Array.jack
@@ -7,12 +16,15 @@
  * Represents an array. Can be used to hold any type of object.
  */
 class Array {
+  /** Constructs a new Array of the given size. */
+  function Array new(int size) {
+    return Memory.alloc(size);
+  }
 
-    /** Constructs a new Array of the given size. */
-    function Array new(int size) {
-    }
+  /** De-allocates the array and frees its space. */
+  method void dispose() {
+    do Memory.deAlloc(this);
 
-    /** De-allocates the array and frees its space. */
-    method void dispose() {
-    }
+    return;
+  }
 }
