@@ -1,4 +1,13 @@
-// This file is part of www.nand2tetris.org
+//============================================================
+// USERID:......... KMANZANA
+// PROGRAMMER:..... Manzanares, Kelton M.
+// COURSE:......... CSCI-410
+// TERM:........... SP14
+// PROJECT:........ ECS12
+// FILENAME:....... Sys.jack
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/12/Sys.jack
@@ -7,20 +16,20 @@
  * A library of basic system services.
  */
 class Sys {
+  /** Performs all the initializations required by the OS. */
+  function void init() {
+  }
 
-    /** Performs all the initializations required by the OS. */
-    function void init() {
-    }
+  /** Halts execution. */
+  function void halt() {
+  }
 
-    /** Halts execution. */
-    function void halt() {
-    }
+  /** Waits approximately duration milliseconds and then returns. */
+  function void wait(int duration) {
+    // do Sys.error(1); // Sys.wait: Duration must be positive
+  }
 
-    /** Waits approximately duration milliseconds and then returns. */
-    function void wait(int duration) {
-    }
-
-    /** Prints the given error code in the form "ERR<errorCode>", and halts. */
-    function void error(int errorCode) {
-    }
+  /** Prints the given error code in the form "ERR<errorCode>", and halts. */
+  function void error(int errorCode) {
+  }
 }

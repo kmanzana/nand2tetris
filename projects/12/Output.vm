@@ -1564,6 +1564,28 @@ pop pointer 1
 push that 0
 return
 function Output.moveCursor 0
+push argument 0
+push constant 0
+lt
+push argument 0
+push constant 22
+gt
+or
+push argument 1
+push constant 0
+lt
+push argument 1
+push constant 63
+gt
+or
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 20
+call Sys.error 1
+pop temp 0
+label IF_FALSE0
 push constant 0
 push static 1
 add
@@ -1616,7 +1638,7 @@ goto WHILE_EXP0
 label WHILE_END0
 push constant 0
 return
-function Output.printInt 1
+function Output.printInt 0
 push argument 0
 push constant 0
 lt
@@ -1923,7 +1945,7 @@ lt
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 80
+push constant 6
 call String.new 1
 pop local 2
 push local 2

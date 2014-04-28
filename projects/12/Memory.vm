@@ -24,12 +24,32 @@ pop that 0
 push constant 0
 return
 function Memory.alloc 1
+push argument 0
+push constant 1
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 5
+call Sys.error 1
+pop temp 0
+label IF_FALSE0
 push static 1
 pop local 0
 push static 1
 push argument 0
 add
 pop static 1
+push static 1
+push constant 16383
+gt
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 6
+call Sys.error 1
+pop temp 0
+label IF_FALSE1
 push local 0
 return
 function Memory.deAlloc 0

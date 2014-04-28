@@ -62,32 +62,42 @@ label WHILE_END0
 push local 0
 return
 function Math.divide 1
-push argument 0
+push argument 1
 push constant 0
-lt
+eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push argument 0
-neg
-push argument 1
-call Math.divide 2
-neg
-return
+push constant 3
+call Sys.error 1
+pop temp 0
 label IF_FALSE0
-push argument 1
+push argument 0
 push constant 0
 lt
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
 push argument 0
+neg
+push argument 1
+call Math.divide 2
+neg
+return
+label IF_FALSE1
+push argument 1
+push constant 0
+lt
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push argument 0
 push argument 1
 neg
 call Math.divide 2
 neg
 return
-label IF_FALSE1
+label IF_FALSE2
 push constant 0
 pop local 0
 label WHILE_EXP0
@@ -113,6 +123,16 @@ label WHILE_END0
 push local 0
 return
 function Math.sqrt 2
+push argument 0
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 4
+call Sys.error 1
+pop temp 0
+label IF_FALSE0
 push constant 1
 pop local 0
 label WHILE_EXP0
@@ -128,14 +148,14 @@ pop local 1
 push local 1
 push argument 0
 gt
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push local 0
 push constant 1
 sub
 return
-label IF_FALSE0
+label IF_FALSE1
 push local 0
 push constant 1
 add

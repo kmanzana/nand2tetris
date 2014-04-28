@@ -63,6 +63,10 @@ class Math {
   function int divide(int x, int y) {
     var int quotient;
 
+    if (y = 0) {
+      do Sys.error(3); // Math.divide: Division by zero
+    }
+
     if (x < 0) {
       return -Math.divide(-x, y);
     }
@@ -84,6 +88,11 @@ class Math {
   /** Returns the integer part of the square root of x. */
   function int sqrt(int x) {
     var int test, test_square;
+
+    if (x < 0) {
+      do Sys.error(4); // Math.sqrt: Cannot compute square root of a negative number
+    }
+
 
     let test = 1;
 

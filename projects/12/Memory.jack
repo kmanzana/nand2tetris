@@ -43,8 +43,16 @@ class Memory {
   function int alloc(int size) {
     var int pointer;
 
+    if (size < 1) {
+      do Sys.error(5); // Memory.alloc: Allocated memory size must be positive
+    }
+
     let pointer = free;
     let free = free + size;
+
+    if (free > 16383) {
+      do Sys.error(6); // Memory.alloc: Heap overflow
+    }
 
     return pointer;
   }
