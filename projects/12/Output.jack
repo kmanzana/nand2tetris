@@ -233,8 +233,6 @@ class Output {
   /** Prints i starting at the cursor location, and advances the
    *  cursor appropriately. */
   function void printInt(int i) {
-    var String minus;
-
     if (i < 0) {
       do Output.printChar(45);
       let i = -i;
@@ -332,7 +330,7 @@ class Output {
     let c = lastDigit + 48;
 
     if (n < 10) {
-      let s = String.new(80);
+      let s = String.new(6);
       return s.appendChar(c);
     } else {
       let s = Output.int2String(n / 10);
