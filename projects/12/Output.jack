@@ -217,22 +217,63 @@ class Output {
   /** Prints s starting at the cursor location, and advances the
    *  cursor appropriately. */
   function void printString(String s) {
+    var int i;
+
+    let i = 0;
+
+    while (i < s.length()) {
+      do Output.printChar(s.charAt(i));
+
+      let i = i + 1;
+    }
+
     return;
   }
 
   /** Prints i starting at the cursor location, and advances the
    *  cursor appropriately. */
   function void printInt(int i) {
+    var String minus;
+
+    if (i < 0) {
+      do Output.printChar(45);
+      let i = -i;
+    }
+
+    do Output.printString(Output.int2String(i));
+
     return;
   }
 
   /** Advances the cursor to the beginning of the next line. */
   function void println() {
+    let cursor[1] = 0;
+
+    if (cursor[0] = 22) {
+      let cursor[0] = 0;
+    } else {
+      let cursor[0] = cursor[0] + 1;
+    }
+
     return;
   }
 
   /** Moves the cursor one column back. */
   function void backSpace() {
+    if (cursor[1] = 0) {
+      let cursor[1] = 63;
+
+      if (cursor[0] = 0) {
+        let cursor[0] = 22;
+      } else {
+        let cursor[0] = cursor[0] - 1;
+      }
+    } else {
+      let cursor[1] = cursor[1] - 1;
+    }
+
+    do Output.print_char(32);
+
     return;
   }
 
@@ -269,9 +310,8 @@ class Output {
       let row_bits = char_map[row];
 
       while (col < 8) {
-        if (col_masks[col] & row_bits) {
-          do Screen.drawPixel(col_offset + col, row_offset + row);
-        }
+        do Screen.setColor(col_masks[col] & row_bits);
+        do Screen.drawPixel(col_offset + col, row_offset + row);
 
         let col = col + 1;
       }
@@ -280,5 +320,23 @@ class Output {
     }
 
     return;
+  }
+
+  function String int2String(int n) {
+    var int lastDigit;
+    var int c;
+    var String s;
+
+    let lastDigit = n - ((n / 10) * 10); // n % 10
+
+    let c = lastDigit + 48;
+
+    if (n < 10) {
+      let s = String.new(80);
+      return s.appendChar(c);
+    } else {
+      let s = Output.int2String(n / 10);
+      return s.appendChar(c);
+    }
   }
 }
