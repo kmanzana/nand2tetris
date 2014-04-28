@@ -7,34 +7,48 @@
  * Graphic screen library.
  */
 class Screen {
+  /** Initializes the Screen. */
+  function void init() {
+  }
 
-    /** Initializes the Screen. */
-    function void init() {
-    }
+  /** Erases the whole screen. */
+  function void clearScreen() {
+  }
 
-    /** Erases the whole screen. */
-    function void clearScreen() {
-    }
+  /** Sets the color to be used in further draw commands
+   *  where white = false, black = true. */
+  function void setColor(boolean b) {
+  }
 
-    /** Sets the color to be used in further draw commands
-     *  where white = false, black = true. */
-    function void setColor(boolean b) {
-    }
+  /** Draws the (x, y) pixel. */
+  function void drawPixel(int x, int y) {
+  }
 
-    /** Draws the (x, y) pixel. */
-    function void drawPixel(int x, int y) {
-    }
+  /** Draws a line from (x1, y1) to (x2, y2). */
+  function void drawLine(int x1, int y1, int x2, int y2) {
+    var int a, b, dx, dy, criterion;
 
-    /** Draws a line from (x1, y1) to (x2, y2). */
-    function void drawLine(int x1, int y1, int x2, int y2) {
-    }
+    // handle dx and dy == 0 or < 0
 
-    /** Draws a filled rectangle where the top left corner
-     *  is (x1, y1) and the bottom right corner is (x2, y2). */
-    function void drawRectangle(int x1, int y1, int x2, int y2) {
-    }
+    while ((a < dx) & (b < dy)) {
+      let criterion = (b * dx) - (a * dx);
 
-    /** Draws a filled circle of radius r around (cx, cy). */
-    function void drawCircle(int cx, int cy, int r) {
+      if (criterion > 0) {
+        let a = a + 1;
+      } else {
+        let b = b + 1;
+      }
+
+      do Screen.drawPixel(a, b);
     }
+  }
+
+  /** Draws a filled rectangle where the top left corner
+   *  is (x1, y1) and the bottom right corner is (x2, y2). */
+  function void drawRectangle(int x1, int y1, int x2, int y2) {
+  }
+
+  /** Draws a filled circle of radius r around (cx, cy). */
+  function void drawCircle(int cx, int cy, int r) {
+  }
 }

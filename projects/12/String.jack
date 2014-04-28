@@ -21,6 +21,10 @@ class String {
 
   /** Constructs a new empty String with a maximum length of maxLength. */
   constructor String new(int maxLength) {
+    if (maxLength < 0) {
+      do Sys.error(14); // String.new: Maximum length must be non-negative
+    }
+
     let string_end = 0;
     let max_length = maxLength + 1;
     let string_array = Array.new(max_length);
@@ -43,11 +47,19 @@ class String {
 
   /** Returns the character at location j. */
   method char charAt(int j) {
+    if ((j < 0) | (j > (string_end - 1))) {
+      do Sys.error(15); // String.charAt: String index out of bounds
+    }
+
     return string_array[j];
   }
 
   /** Sets the j'th character of this string to be c. */
   method void setCharAt(int j, char c) {
+    if ((j < 0) | (j > (string_end - 1))) {
+      do Sys.error(16); // String.setCharAt: String index out of bounds
+    }
+
     let string_array[j] = c;
 
     return;
@@ -57,7 +69,7 @@ class String {
    *  Returns this string as the return value. */
   method String appendChar(char c) {
     if (string_end = max_length) {
-      do Sys.error(17);
+      do Sys.error(17); // String.appendChar: String is full
     }
 
     let string_array[string_end] = c;
@@ -68,6 +80,10 @@ class String {
 
   /** Erases the last character from this String. */
   method void eraseLastChar() {
+    if (string_end = 0) {
+      do Sys.error(18); // String.eraseLastChar: String is empty
+    }
+
     let string_end = string_end - 1;
     let string_array[string_end] = 0;
 
@@ -112,7 +128,7 @@ class String {
       let number = -number;
 
       if (string_end = max_length) {
-        do Sys.error(19);
+        do Sys.error(19); // String.setInt: Insufficient string capacity
       }
 
       do appendChar(45);
@@ -120,7 +136,7 @@ class String {
 
     while (number > 0) {
       if (string_end = max_length) {
-        do Sys.error(19);
+        do Sys.error(19); // String.setInt: Insufficient string capacity
       }
 
       let exp = 1;
