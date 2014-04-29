@@ -16,54 +16,109 @@
  * Graphic screen library.
  */
 class Screen {
-  // 7   Screen.drawPixel      Illegal pixel coordinates
-  // 8   Screen.drawLine       Illegal line coordinates
-  // 9   Screen.drawRectangle  Illegal rectangle coordinates
-  // 12   Screen.drawCircle     Illegal center coordinates
-  // 13   Screen.drawCircle     Illegal radius
+  static boolean color;
+  static Array bit_masks;
 
   /** Initializes the Screen. */
   function void init() {
+    let color = true;
+
+    let bit_masks = Array.new(16);
+    let bit_masks[0]  = 1;
+    let bit_masks[1]  = 2;
+    let bit_masks[2]  = 4;
+    let bit_masks[3]  = 8;
+    let bit_masks[4]  = 16;
+    let bit_masks[5]  = 32;
+    let bit_masks[6]  = 64;
+    let bit_masks[7]  = 128;
+    let bit_masks[8]  = 256;
+    let bit_masks[9]  = 512;
+    let bit_masks[10] = 1024;
+    let bit_masks[11] = 2048;
+    let bit_masks[12] = 4096;
+    let bit_masks[13] = 8192;
+    let bit_masks[14] = 16384;
+    let bit_masks[15] = 16384 * 2;
+
+    return;
   }
 
   /** Erases the whole screen. */
   function void clearScreen() {
+    return;
   }
 
   /** Sets the color to be used in further draw commands
    *  where white = false, black = true. */
   function void setColor(boolean b) {
+    let color = b;
+
+    return;
   }
 
   /** Draws the (x, y) pixel. */
   function void drawPixel(int x, int y) {
+    var int row, col, bit, address, value;
+
+    let col = x;
+    let row = y;
+
+    if ((col < 0) | (col > 511) | (row < 0) | (row > 255)) {
+      do Sys.error(7); // Screen.drawPixel: Illegal pixel coordinates
+    }
+
+    let bit = col - ((col / 16) * 16); // col % 16
+
+    let address = 16384 + (row * 32) + (col / 16);
+
+    let value = Memory.peek(address);
+
+    if (color) {  // black
+      let value = value | bit_masks[bit];
+    } else {      // white
+      let value = value & ~bit_masks[bit];
+    }
+
+    do Memory.poke(address, value);
+
+    return;
   }
 
   /** Draws a line from (x1, y1) to (x2, y2). */
   function void drawLine(int x1, int y1, int x2, int y2) {
-    var int a, b, dx, dy, criterion;
+    // 8   Screen.drawLine       Illegal line coordinates
 
-    // handle dx and dy == 0 or < 0
+    // var int a, b, dx, dy, criterion;
 
-    while ((a < dx) & (b < dy)) {
-      let criterion = (b * dx) - (a * dx);
+    // // handle dx and dy == 0 or < 0
 
-      if (criterion > 0) {
-        let a = a + 1;
-      } else {
-        let b = b + 1;
-      }
+    // while ((a < dx) & (b < dy)) {
+    //   let criterion = (b * dx) - (a * dx);
 
-      do Screen.drawPixel(a, b);
-    }
+    //   if (criterion > 0) {
+    //     let a = a + 1;
+    //   } else {
+    //     let b = b + 1;
+    //   }
+
+    //   do Screen.drawPixel(a, b);
+    // }
+
+    return;
   }
 
   /** Draws a filled rectangle where the top left corner
    *  is (x1, y1) and the bottom right corner is (x2, y2). */
   function void drawRectangle(int x1, int y1, int x2, int y2) {
+    // 9   Screen.drawRectangle  Illegal rectangle coordinates
+    return;
   }
 
   /** Draws a filled circle of radius r around (cx, cy). */
   function void drawCircle(int cx, int cy, int r) {
+    // 12   Screen.drawCircle     Illegal center coordinates
+    // 13   Screen.drawCircle     Illegal radius
+    return;
   }
 }
