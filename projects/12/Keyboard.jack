@@ -42,7 +42,7 @@ class Keyboard {
    * F1 - F12 = 141 - 152
    */
   function char keyPressed() {
-    return 0;
+    return Memory.peek(24576);
   }
 
   /**
@@ -51,7 +51,18 @@ class Keyboard {
    * the key to the screen, and returns the value of the pressed key.
    */
   function char readChar() {
-    return 0;
+    var char c;
+
+    do Output.printChar(0); // cursor
+
+    while (~(Keyboard.keyPressed())) {}
+    let c = Keyboard.keyPressed();
+    while (Keyboard.keyPressed() = c) {}
+
+    do Output.backSpace(); // remove cursor
+    do Output.printChar(c);
+
+    return c;
   }
 
   /**
@@ -59,7 +70,29 @@ class Keyboard {
    * (until a newline character) from the keyboard, and returns its value.
    */
   function String readLine(String message) {
-    return "";
+    var String s;
+     var char c;
+
+     do Output.printString(message);
+
+     let s = String.new(20);
+
+     while (true) {
+       let c = Keyboard.readChar();
+
+       if (c = String.newLine()) {
+         do Output.println();
+         return s;
+       } else {
+         if (c = String.backSpace()) {
+           do s.eraseLastChar();
+         } else {
+           let s = s.appendChar(c);
+         }
+       }
+     }
+
+     return s;
   }
 
   /**
