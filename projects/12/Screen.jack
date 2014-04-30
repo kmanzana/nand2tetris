@@ -114,7 +114,7 @@ class Screen {
     let dx = x2 - x1;
     let dy = y2 - y1;
 
-    do Screen.drawPixel(a, b);
+    // do Screen.drawPixel(a, b);
 
     if (dy < 0) {
       let b_inc = -1;

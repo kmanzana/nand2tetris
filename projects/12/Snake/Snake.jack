@@ -1,0 +1,155 @@
+//============================================================
+// USERID:......... KMANZANA
+// PROGRAMMER:..... Manzanares, Kelton M.
+// COURSE:......... CSCI-410
+// TERM:........... SP14
+// PROJECT:........ ECS09
+// FILENAME:....... Snake.jack
+//============================================================
+
+/* Class for Snake implementation */
+class Snake {
+  static SnakePen pen;
+  static boolean exit, grow;
+  static char Q, E, P;
+
+  field int length, velocity, index;
+  field Array positions;
+  field char direction;
+
+  constructor Snake new(int setLength, int setVelocity, SnakePen setPen, boolean setGrow) {
+    let length   = setLength;
+    let velocity = (11 - setVelocity) * 2; // expecting 1 - 10
+    let pen      = setPen;
+    let index    = 0;
+
+    let exit   = false;
+    let Q      = 81;
+    let E      = 69;
+    let P      = 80;
+
+    let grow = setGrow;
+
+    let positions = Array.new(length);
+    let direction = SnakePen.initialDirection();
+
+    do initPositions();
+    do move();
+
+    return this;
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(pen);
+    do positions.dispose();
+
+    return;
+  }
+
+  method void run() {
+    var char key;
+
+    while (~exit) {
+      while (key = 0) {
+        let key = Keyboard.keyPressed();
+        do move();
+      }
+
+      if ((key > (SnakePen.directionMin() - 1)) & (key < (SnakePen.directionMax() + 1))) {
+        let direction = key;
+      }
+      if ((key = Q) | (key = E)) {
+        do dispose();
+        let exit = true;
+      }
+      if (key = P) {
+        do printDebug();
+      }
+
+      while (~(key = 0)) {
+        let key = Keyboard.keyPressed();
+        do move();
+      }
+    }
+
+    return;
+  }
+
+  method void move() {
+    var Array tail, head, newHead;
+
+    let tail = positions[incrementedIndex()];
+    let head = positions[index];
+    let newHead = tail;
+
+    do Screen.setColor(false);
+    do Screen.drawPixel(tail[0], tail[1]);
+
+    let newHead[0] = pen.nextXPosition(head[0], direction);
+    let newHead[1] = pen.nextYPosition(head[1], direction);
+
+    do Screen.setColor(true);
+    do Screen.drawPixel(newHead[0], newHead[1]);
+
+    let index = incrementedIndex();
+
+    do Sys.wait(velocity);
+
+    return;
+  }
+
+  method void initPositions() {
+    var int i;
+    var Array coordinate;
+
+    while (i < length) {
+      let coordinate = Array.new(2);
+      let coordinate[0] = pen.getXMax();
+      let coordinate[1] = pen.getYMid();
+
+      let positions[i] = coordinate;
+
+      let i = i + 1;
+    }
+
+    return;
+  }
+
+  method void printDebug() {
+    var String str;
+    let str = String.new(1);
+    let str = str.appendChar(String.newLine());
+
+    do Output.printString("SP: ");
+    do Output.printInt(Memory.peek(0));
+    do Output.printString(str);
+
+    do printPosition(-1);
+    return;
+  }
+
+  method int printPosition(int i) {
+    var Array tmp;
+
+    if (i < (length - 1)) {
+      let tmp = positions[i];
+      do Output.printInt(tmp[0]);
+      do Output.printString(" ");
+      do Output.printInt(tmp[1]);
+      do Output.printString(" ");
+
+      return printPosition(i + 1);
+    } else {
+      do Output.println();
+      return length;
+    }
+  }
+
+  method int incrementedIndex() {
+    if ((index + 1) = length) {
+      return 0;
+    } else {
+      return index + 1;
+    }
+  }
+}
