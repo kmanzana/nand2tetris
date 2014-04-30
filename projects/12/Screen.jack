@@ -90,7 +90,7 @@ class Screen {
     var int a, b, a_inc, b_inc, dx, dy, criterion, temp;
 
     if ((x1 < 0) | (x1 > 511) | (y1 < 0) | (y1 > 255) |
-      (x2 < 0) | (x2 > 511) | (y2 < 0) | (y2 > 255)) {
+        (x2 < 0) | (x2 > 511) | (y2 < 0) | (y2 > 255)) {
       do Sys.error(8); // Screen.drawLine: Illegal line coordinates
     }
 
@@ -166,7 +166,31 @@ class Screen {
   /** Draws a filled rectangle where the top left corner
    *  is (x1, y1) and the bottom right corner is (x2, y2). */
   function void drawRectangle(int x1, int y1, int x2, int y2) {
-    // 9   Screen.drawRectangle  Illegal rectangle coordinates
+    var int temp, dx, dy, a, b;
+
+    if ((x1 < 0) | (x1 > 511) | (y1 < 0) | (y1 > 255) |
+        (x2 < 0) | (x2 > 511) | (y2 < 0) | (y2 > 255) |
+        (x1 > x2) | (y1 > y2)) {
+      do Sys.error(9); // Screen.drawRectangle: Illegal rectangle coordinates
+    }
+
+    let a = 0;
+    let b = 0;
+
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+
+    while (b < dy) {
+      while (a < dx) {
+        do Screen.drawPixel(x1 + a, y1 + b);
+
+        let a = a + 1;
+      }
+
+      let a = 0;
+      let b = b + 1;
+    }
+
     return;
   }
 

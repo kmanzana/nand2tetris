@@ -460,7 +460,99 @@ goto WHILE_EXP3
 label WHILE_END3
 push constant 0
 return
-function Screen.drawRectangle 0
+function Screen.drawRectangle 5
+push argument 0
+push constant 0
+lt
+push argument 0
+push constant 511
+gt
+or
+push argument 1
+push constant 0
+lt
+or
+push argument 1
+push constant 255
+gt
+or
+push argument 2
+push constant 0
+lt
+or
+push argument 2
+push constant 511
+gt
+or
+push argument 3
+push constant 0
+lt
+or
+push argument 3
+push constant 255
+gt
+or
+push argument 0
+push argument 2
+gt
+or
+push argument 1
+push argument 3
+gt
+or
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 9
+call Sys.error 1
+pop temp 0
+label IF_FALSE0
+push constant 0
+pop local 3
+push constant 0
+pop local 4
+push argument 2
+push argument 0
+sub
+pop local 1
+push argument 3
+push argument 1
+sub
+pop local 2
+label WHILE_EXP0
+push local 4
+push local 2
+lt
+not
+if-goto WHILE_END0
+label WHILE_EXP1
+push local 3
+push local 1
+lt
+not
+if-goto WHILE_END1
+push argument 0
+push local 3
+add
+push argument 1
+push local 4
+add
+call Screen.drawPixel 2
+pop temp 0
+push local 3
+push constant 1
+add
+pop local 3
+goto WHILE_EXP1
+label WHILE_END1
+push constant 0
+pop local 3
+push local 4
+push constant 1
+add
+pop local 4
+goto WHILE_EXP0
+label WHILE_END0
 push constant 0
 return
 function Screen.drawCircle 0
