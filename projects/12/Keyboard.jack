@@ -101,6 +101,6 @@ class Keyboard {
    * integer value (until the first non numeric character).
    */
   function int readInt(String message) {
-    return 0;
+    return String.intValue(Keyboard.readLine(message));
   }
 }

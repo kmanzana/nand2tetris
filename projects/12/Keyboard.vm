@@ -81,5 +81,7 @@ label WHILE_END0
 push local 0
 return
 function Keyboard.readInt 0
-push constant 0
+push argument 0
+call Keyboard.readLine 1
+call String.intValue 1
 return
