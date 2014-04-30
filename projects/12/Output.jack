@@ -26,7 +26,6 @@ class Output {
 
   /** Initializes the screen and locates the cursor at the screen's top-left. */
   function void init() {
-    do Screen.init();
     do Output.initMap();
 
     let cursor = Array.new(2);
