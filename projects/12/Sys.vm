@@ -1,0 +1,12 @@
+function Sys.init 0
+push constant 0
+return
+function Sys.halt 0
+push constant 0
+return
+function Sys.wait 0
+push constant 0
+return
+function Sys.error 0
+push constant 0
+return
