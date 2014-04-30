@@ -196,8 +196,32 @@ class Screen {
 
   /** Draws a filled circle of radius r around (cx, cy). */
   function void drawCircle(int cx, int cy, int r) {
-    // 12   Screen.drawCircle     Illegal center coordinates
-    // 13   Screen.drawCircle     Illegal radius
+    var int dy, sqrt, x1, x2, y;
+
+    if ((cx < 0) | (cx > 511) | (cy < 0) | (cy > 255)) {
+      do Sys.error(12); // Screen.drawCircle: Illegal center coordinates
+    }
+
+    if ((r < 0) | (r > 127) | ((cx - r) < 0) | ((cx + r) > 511) |
+      ((cy - r) < 0) | ((cy + r) > 255)) {
+      do Sys.error(13); // Screen.drawCircle: Illegal radius
+    }
+
+    let dy = -r;
+
+    while (~(dy = r)) {
+      let sqrt = Math.sqrt((r * r) - (dy * dy));
+
+      let x1 = cx - sqrt;
+      let x2 = cx + sqrt;
+
+      let y = cy + dy;
+
+      do Screen.drawLine(x1, y, x2, y);
+
+      let dy = dy + 1;
+    }
+
     return;
   }
 }
