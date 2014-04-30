@@ -8,12 +8,6 @@ class Main {
 
     /** Draws a sample pictue on the screen using lines and circles. */
     function void main() {
-        do Screen.drawPixel(0,0);
-        do Screen.drawPixel(1,0);
-        do Screen.drawPixel(2,0);
-        do Screen.drawPixel(14,0);
-        do Screen.drawPixel(15,0);
-
         do Screen.drawLine(0,220,511,220);        // base line
         do Screen.drawRectangle(280,90,410,220);  // house
 

@@ -87,23 +87,78 @@ class Screen {
 
   /** Draws a line from (x1, y1) to (x2, y2). */
   function void drawLine(int x1, int y1, int x2, int y2) {
-    // 8   Screen.drawLine       Illegal line coordinates
+    var int a, b, a_inc, b_inc, dx, dy, criterion, temp;
 
-    // var int a, b, dx, dy, criterion;
+    if ((x1 < 0) | (x1 > 511) | (y1 < 0) | (y1 > 255) |
+      (x2 < 0) | (x2 > 511) | (y2 < 0) | (y2 > 255)) {
+      do Sys.error(8); // Screen.drawLine: Illegal line coordinates
+    }
 
-    // // handle dx and dy == 0 or < 0
+    let a = 0;
+    let b = 0;
 
-    // while ((a < dx) & (b < dy)) {
-    //   let criterion = (b * dx) - (a * dx);
+    if (~(x1 < x2)) {
+      let temp = x1;
+      let x1 = x2;
+      let x2 = temp;
 
-    //   if (criterion > 0) {
-    //     let a = a + 1;
-    //   } else {
-    //     let b = b + 1;
-    //   }
+      let temp = y1;
+      let y1 = y2;
+      let y2 = temp;
+    }
 
-    //   do Screen.drawPixel(a, b);
-    // }
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+
+    do Screen.drawPixel(a, b);
+
+    if (dy < 0) {
+      let b_inc = -1;
+    } else {
+      let b_inc = 1;
+    }
+
+    if (dy = 0) {
+      while (~(a = dx)) {
+        let a = a + 1;
+        do Screen.drawPixel(x1 + a, y1);
+      }
+
+      return;
+    }
+
+    if (dx = 0) {
+      while (~(b = dy)) {
+        let b = b + b_inc;
+        do Screen.drawPixel(x1, y1 + b);
+      }
+
+      return;
+    }
+
+    while ((a < dx) & (b < dy)) {
+      let criterion = (a * dy) - (b * dx);
+
+      if (criterion < 0) {
+        let a = a + 1;
+      } else {
+        let b = b + 1;
+      }
+
+      do Screen.drawPixel(x1 + a, y1 + b);
+    }
+
+    while ((a < dx) & (b > dy)) {
+      let criterion = (a * dy) - (b * dx);
+
+      if (criterion > 0) {
+        let a = a + 1;
+      } else {
+        let b = b - 1;
+      }
+
+      do Screen.drawPixel(x1 + a, y1 + b);
+    }
 
     return;
   }
