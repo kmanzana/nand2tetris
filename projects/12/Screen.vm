@@ -129,8 +129,8 @@ push constant 15
 push static 1
 add
 push constant 16384
-push constant 2
-call Math.multiply 2
+push constant 16384
+add
 pop temp 0
 pop pointer 1
 push temp 0

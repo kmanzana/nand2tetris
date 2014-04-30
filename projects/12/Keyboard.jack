@@ -101,6 +101,10 @@ class Keyboard {
    * integer value (until the first non numeric character).
    */
   function int readInt(String message) {
-    return String.intValue(Keyboard.readLine(message));
+    var String s;
+
+    let s = Keyboard.readLine(message);
+
+    return s.intValue();
   }
 }

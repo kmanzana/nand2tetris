@@ -39,7 +39,7 @@ class Screen {
     let bit_masks[12] = 4096;
     let bit_masks[13] = 8192;
     let bit_masks[14] = 16384;
-    let bit_masks[15] = 16384 * 2;
+    let bit_masks[15] = 16384 + 16384;
 
     return;
   }

@@ -80,8 +80,10 @@ goto WHILE_EXP0
 label WHILE_END0
 push local 0
 return
-function Keyboard.readInt 0
+function Keyboard.readInt 1
 push argument 0
 call Keyboard.readLine 1
+pop local 0
+push local 0
 call String.intValue 1
 return

@@ -16,8 +16,28 @@
  * A basic math library.
  */
 class Math {
+  static Array bit_masks;
+
   /** Initializes the library. */
   function void init() {
+    let bit_masks = Array.new(16);
+    let bit_masks[0]  = 1;
+    let bit_masks[1]  = 2;
+    let bit_masks[2]  = 4;
+    let bit_masks[3]  = 8;
+    let bit_masks[4]  = 16;
+    let bit_masks[5]  = 32;
+    let bit_masks[6]  = 64;
+    let bit_masks[7]  = 128;
+    let bit_masks[8]  = 256;
+    let bit_masks[9]  = 512;
+    let bit_masks[10] = 1024;
+    let bit_masks[11] = 2048;
+    let bit_masks[12] = 4096;
+    let bit_masks[13] = 8192;
+    let bit_masks[14] = 16384;
+    let bit_masks[15] = 16384 + 16384;
+
     // create sqrt mask lut
     return;
   }
@@ -33,7 +53,7 @@ class Math {
 
   /** Returns the product of x and y. */
   function int multiply(int x, int y) {
-    var int sum, shifted_x;
+    var int sum, shifted_x, j;
 
     if (x < 0) {
       return -Math.multiply(-x, y);
@@ -43,25 +63,26 @@ class Math {
       return -Math.multiply(x, -y);
     }
 
+    let j = 0;
     let sum = 0;
+    let shifted_x = x;
 
-    while (x > 0) {
-      let sum = sum + y;
-      let x = x - 1;
+    while (j < 16) {
+      if (bit_masks[j] & y) {
+        let sum = sum + shifted_x;
+      }
+
+      let shifted_x = shifted_x + shifted_x;
+
+      let j = j + 1;
     }
-
-    // let shifted_x = x;
-    // for j = 0..(n−1) do
-    //   if (j-th bit of y) = 1 then
-    //     sum = sum + shiftedX
-    //   shiftedX = shiftedX * 2
 
     return sum;
   }
 
   /** Returns the integer part of x/y. */
   function int divide(int x, int y) {
-    var int quotient;
+    var int q;
 
     if (y = 0) {
       do Sys.error(3); // Math.divide: Division by zero
@@ -75,14 +96,17 @@ class Math {
       return -Math.divide(x, -y);
     }
 
-    let quotient = 0;
-
-    while ((x > y) | (x = y)) {
-      let quotient = quotient + 1;
-      let x = x - y;
+    if (y > x) {
+      return 0;
     }
 
-    return quotient;
+    let q = Math.divide(x, y + y);
+
+    if ((x - (2 * q * y)) < y) {
+      return q + q;
+    } else {
+      return q + q + 1;
+    }
   }
 
   /** Returns the integer part of the square root of x. */
