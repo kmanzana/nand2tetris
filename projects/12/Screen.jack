@@ -46,6 +46,10 @@ class Screen {
 
   /** Erases the whole screen. */
   function void clearScreen() {
+    do Screen.setColor(false);
+    do Screen.drawRectangle(0, 0, 511, 255);
+    do Screen.setColor(true);
+
     return;
   }
 
