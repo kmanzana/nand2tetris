@@ -1,0 +1,67 @@
+//============================================================
+// USERID:......... KMANZANA
+// PROGRAMMER:..... Manzanares, Kelton M.
+// COURSE:......... CSCI-410
+// TERM:........... SP14
+// PROJECT:........ ECS13
+// FILENAME:....... Main.jack
+//============================================================
+
+// This file is based on a file from www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/13/T09/Main.jack
+
+/** Test program for the OS Output class. */
+class Main {
+  /** Outputs the entire character set to the screen using all the
+   *  methods of the Output class. */
+  function void main() {
+    var String s;
+
+    let s = String.new(1);
+    do s.appendChar(String.doubleQuote());
+
+    do Output.printString("Top line should disappear.");
+    do Output.println();
+
+    do Output.moveCursor(17, 0);
+    do Output.printString("0123456789");
+    do Output.println();
+
+    do Output.printString("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz long string going onto another line");
+    do Output.println();
+
+    do Output.printString("!#$%&'()*+,-./:;<=>?@[\]^_`{|}~");
+    do Output.printString(s);
+    do Output.println();
+
+    do Output.printInt(-12345);
+    do Output.backSpace();
+    do Output.printInt(6789);
+    do Output.println();
+
+    do Output.printString("This line should appear at the bottom.");
+    do Output.println();
+
+    do Output.printString("This line should appear below the previous line.");
+    do Output.println();
+
+    do Output.printString("Another line after first scroll.");
+    do Output.println();
+
+    do Output.printString("A really long line that goes onto the line below it because it is so long.");
+    do Output.println();
+    do Output.println();
+
+    while (true) {
+      let s =  Keyboard.readLine("Now go ahead and type: ");
+      do Output.println();
+
+      do Output.printString(s);
+      do Output.println();
+    }
+
+    return;
+  }
+}

@@ -117,7 +117,6 @@ class Math {
       do Sys.error(4); // Math.sqrt: Cannot compute square root of a negative number
     }
 
-
     let test = 1;
 
     while (test < 181) {
